@@ -4,16 +4,19 @@
  * Renders verified findings with status badges, values, range bars, and row selection.
  */
 
-import React from "react";
+import React, { useState } from "react";
 import { VerifiedFinding } from "@/lib/report/types";
 import { StatusBadge } from "@/components/StatusBadge";
 import { RangeBar } from "./RangeBar";
-import { AlertCircle, Eye } from "lucide-react";
+import { AlertCircle, Eye, ShieldCheck } from "lucide-react";
+import { EvidenceVerificationModal } from "./EvidenceVerificationModal";
 
 interface FindingsTableProps {
   findings: VerifiedFinding[];
   selectedFindingId: string | null;
   onSelectFinding: (id: string) => void;
+  reportTitle?: string;
+  sourceTextAvailable?: boolean;
   className?: string;
 }
 
@@ -21,8 +24,12 @@ export function FindingsTable({
   findings,
   selectedFindingId,
   onSelectFinding,
+  reportTitle,
+  sourceTextAvailable = true,
   className = "",
 }: FindingsTableProps) {
+  const [verifyingFinding, setVerifyingFinding] = useState<VerifiedFinding | null>(null);
+
   if (!findings || findings.length === 0) {
     return (
       <div className={`p-8 text-center text-sm text-muted-foreground ${className}`}>
@@ -32,18 +39,19 @@ export function FindingsTable({
   }
 
   return (
-    <div className={`overflow-x-auto rounded-xl border border-border bg-card shadow-sm ${className}`}>
-      <table className="w-full text-left text-sm">
-        <thead className="border-b border-border bg-muted/40 text-xs font-semibold uppercase text-muted-foreground tracking-wider">
-          <tr>
-            <th className="py-3 px-4">Status</th>
-            <th className="py-3 px-4">Test Name</th>
-            <th className="py-3 px-4">Result Value</th>
-            <th className="py-3 px-4 min-w-[200px]">Reference Range</th>
-            <th className="py-3 px-3 text-center">Page</th>
-            <th className="py-3 px-3 text-center">Evidence</th>
-          </tr>
-        </thead>
+    <>
+      <div className={`overflow-x-auto rounded-xl border border-border bg-card shadow-sm ${className}`}>
+        <table className="w-full text-left text-sm">
+          <thead className="border-b border-border bg-muted/40 text-xs font-semibold uppercase text-muted-foreground tracking-wider">
+            <tr>
+              <th className="py-3 px-4">Status</th>
+              <th className="py-3 px-4">Test Name</th>
+              <th className="py-3 px-4">Result Value</th>
+              <th className="py-3 px-4 min-w-[200px]">Reference Range</th>
+              <th className="py-3 px-3 text-center">Page</th>
+              <th className="py-3 px-4 text-center">Evidence</th>
+            </tr>
+          </thead>
         <tbody className="divide-y divide-border">
           {findings.map((f) => {
             const isSelected = f.id === selectedFindingId;
@@ -105,23 +113,37 @@ export function FindingsTable({
                   {f.evidence.page ? `P.${f.evidence.page}` : "—"}
                 </td>
 
-                {/* View Evidence */}
-                <td className="py-3.5 px-3 text-center">
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onSelectFinding(f.id);
-                    }}
-                    className={`inline-flex items-center justify-center h-7 w-7 rounded-md text-xs transition-colors ${
-                      isSelected
-                        ? "bg-primary text-white shadow-sm"
-                        : "text-muted-foreground hover:bg-muted hover:text-foreground"
-                    }`}
-                    title="Inspect Quote in Source"
-                  >
-                    <Eye className="h-4 w-4" />
-                  </button>
+                {/* View / Verify Evidence */}
+                <td className="py-3.5 px-4 text-center whitespace-nowrap">
+                  <div className="flex items-center justify-center gap-1.5">
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setVerifyingFinding(f);
+                      }}
+                      className="inline-flex items-center gap-1 rounded-lg border border-primary/30 bg-primary/5 px-2.5 py-1 text-xs font-semibold text-primary hover:bg-primary/10 transition-colors shadow-2xs"
+                      title="Verify Evidence Behind Finding"
+                    >
+                      <ShieldCheck className="h-3.5 w-3.5" />
+                      <span>Verify Evidence</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onSelectFinding(f.id);
+                      }}
+                      className={`inline-flex items-center justify-center h-7 w-7 rounded-md text-xs transition-colors ${
+                        isSelected
+                          ? "bg-primary text-white shadow-sm"
+                          : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                      }`}
+                      title="Highlight in Source Document"
+                    >
+                      <Eye className="h-4 w-4" />
+                    </button>
+                  </div>
                 </td>
               </tr>
             );
@@ -129,5 +151,15 @@ export function FindingsTable({
         </tbody>
       </table>
     </div>
+
+    {/* Dedicated Evidence Verification Modal */}
+    <EvidenceVerificationModal
+      finding={verifyingFinding}
+      reportTitle={reportTitle}
+      sourceTextAvailable={sourceTextAvailable}
+      isOpen={Boolean(verifyingFinding)}
+      onClose={() => setVerifyingFinding(null)}
+    />
+  </>
   );
 }

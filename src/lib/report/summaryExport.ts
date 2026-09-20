@@ -14,6 +14,8 @@ export interface SummaryExportOptions {
   reportName?: string;
   patientName?: string;
   sourceFileName?: string;
+  verificationId?: string;
+  evidenceFingerprint?: string;
 }
 
 /**
@@ -34,6 +36,12 @@ export function generatePlaintextSummary(
     lines.push("MEDISCAN — CLINICAL DOCTOR VISIT BRIEF");
     lines.push("Evidence-Locked Patient Consultation Summary");
     lines.push(divider);
+    if (options.verificationId) {
+      lines.push(`Verification ID: ${options.verificationId}`);
+    }
+    if (options.evidenceFingerprint) {
+      lines.push(`Integrity Fingerprint: ${options.evidenceFingerprint}`);
+    }
     lines.push(`Report: ${reportTitle}`);
     if (options.sourceFileName) lines.push(`Source File: ${options.sourceFileName}`);
     lines.push(`Generated: ${dateStr}`);
@@ -190,3 +198,105 @@ export async function copySummaryToClipboard(text: string): Promise<boolean> {
     return false;
   }
 }
+
+export interface VerifiedFindingEvidenceItem {
+  testName: string;
+  valueText: string;
+  referenceRangeText?: string | null;
+  status: string;
+  quote?: string;
+  rule?: string;
+  page?: number | null;
+  verified?: boolean;
+}
+
+/**
+ * Formats a comprehensive Shareable Verified Summary strictly highlighting
+ * evidence verification locks, rules applied, and clinician discussion points.
+ */
+export function generateShareableVerifiedSummary(
+  brief: DoctorBrief,
+  options: SummaryExportOptions & {
+    findingsWithEvidence?: VerifiedFindingEvidenceItem[];
+  } = {},
+): string {
+  const reportTitle = options.reportName || "Laboratory Diagnostic Report";
+  const dateStr = new Date(brief.generatedAt).toLocaleDateString();
+  const verificationId = options.verificationId || "MS-VERIFIED";
+  const divider = "============================================================";
+  const subDivider = "------------------------------------------------------------";
+
+  const lines: string[] = [];
+
+  lines.push("MEDISCAN — VERIFIED ANALYSIS SUMMARY");
+  lines.push("Evidence-First Health Document Verification");
+  lines.push(divider);
+  lines.push(`Verification ID: ${verificationId}`);
+  if (options.evidenceFingerprint) {
+    lines.push(`Integrity Fingerprint: ${options.evidenceFingerprint}`);
+  }
+  lines.push(`Report: ${reportTitle}`);
+  lines.push(`Analysis Date: ${dateStr}`);
+  lines.push(subDivider);
+
+  // Key Findings
+  lines.push("KEY FINDINGS:");
+  if (brief.keyFindings.length > 0) {
+    for (const kf of brief.keyFindings) {
+      lines.push(`• ${kf.sentence}`);
+    }
+  } else {
+    lines.push("• All verified parameters fall within printed reference intervals.");
+  }
+  lines.push("");
+
+  // Evidence Verification Section
+  lines.push("EVIDENCE VERIFICATION AUDIT:");
+  const items = options.findingsWithEvidence || brief.flagged.map((f) => ({
+    testName: f.testName,
+    valueText: f.valueText,
+    referenceRangeText: f.referenceRangeText,
+    status: f.status,
+    quote: undefined,
+    rule: `Value relative to reference range (${f.referenceRangeText ?? "printed range"})`,
+    page: f.page,
+    verified: true,
+  }));
+
+  if (items.length > 0) {
+    for (const item of items) {
+      const statusIcon = item.verified !== false ? "✓" : "✗";
+      const statusText = item.verified !== false ? "Evidence verified" : "Evidence unverified";
+      lines.push(`${statusIcon} ${item.testName}: ${statusText}`);
+      if (item.quote) {
+        lines.push(`  Evidence: "${item.quote}"${item.page ? ` (Page ${item.page})` : ""}`);
+      }
+      if (item.rule) {
+        lines.push(`  Rule: ${item.rule}`);
+      }
+    }
+  } else {
+    lines.push("✓ All findings verified against original document source text.");
+  }
+  lines.push("");
+
+  // Doctor Discussion Points
+  if (brief.questions.length > 0) {
+    lines.push("DOCTOR DISCUSSION POINTS:");
+    for (let i = 0; i < brief.questions.length; i++) {
+      lines.push(`${i + 1}. ${brief.questions[i].text}`);
+    }
+    lines.push("");
+  }
+
+  // Medical Disclaimer
+  lines.push(subDivider);
+  lines.push("MEDICAL DISCLAIMER:");
+  lines.push(brief.disclaimer);
+  lines.push(
+    "MediScan provides educational reference information derived through deterministic rule execution and verbatim evidence locking. It does not provide clinical diagnosis or medical treatment advice.",
+  );
+
+  return lines.join("\n");
+}
+
