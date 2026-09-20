@@ -1,16 +1,29 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { useServerFn } from "@tanstack/react-start";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { AuthGate } from "@/components/AuthGate";
 import { Disclaimer } from "@/components/Disclaimer";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { analyzeReport, type ReportResult } from "@/lib/ai.functions";
+import { ReportInput } from "@/components/report/ReportInput";
+import { FindingsTable } from "@/components/report/FindingsTable";
+import { FindingDetail } from "@/components/report/FindingDetail";
+import { SourceViewer } from "@/components/report/SourceViewer";
+import { PipelineTrace } from "@/components/report/PipelineTrace";
+import { DoctorBriefView } from "@/components/report/DoctorBrief";
+import { VerificationLab } from "@/components/report/VerificationLab";
+import { useReportPipeline } from "@/hooks/useReportPipeline";
 import { saveAnalysis } from "@/lib/analyses";
 import { toast } from "sonner";
-import { FileText, Upload, AlertOctagon, CheckCircle2 } from "lucide-react";
+import {
+  FileText,
+  RotateCcw,
+  ShieldCheck,
+  AlertTriangle,
+  FileCheck,
+  FlaskConical,
+  Activity,
+  Layers,
+} from "lucide-react";
 
 export const Route = createFileRoute("/analyzer")({
   head: () => ({ meta: [{ title: "Report Analyzer — MediScan AI" }] }),
@@ -21,193 +34,252 @@ export const Route = createFileRoute("/analyzer")({
   ),
 });
 
+type ActiveTab = "findings" | "brief" | "trace" | "lab";
+
 function Analyzer() {
-  const [text, setText] = useState("");
-  const [title, setTitle] = useState("");
-  const [result, setResult] = useState<ReportResult | null>(null);
-  const analyzeFn = useServerFn(analyzeReport);
   const qc = useQueryClient();
+  const [activeTab, setActiveTab] = useState<ActiveTab>("findings");
+  const [reportTitle, setReportTitle] = useState<string>("");
+  const [lastSourceText, setLastSourceText] = useState<string>("");
 
-  const m = useMutation({
-    mutationFn: async () => {
-      const out = await analyzeFn({ data: { text } });
-      const finalTitle = title.trim() || `Report · ${new Date().toLocaleDateString()}`;
-      await saveAnalysis({ kind: "report", title: finalTitle, input: text, result: out });
-      qc.invalidateQueries({ queryKey: ["analyses"] });
-      return out;
-    },
-    onSuccess: (r) => {
-      setResult(r);
-      toast.success("Report analyzed and saved");
-    },
-    onError: (e: Error) => toast.error(e.message),
-  });
+  const {
+    status,
+    analysis,
+    error,
+    selectedFindingId,
+    selectedFinding,
+    setSelectedFindingId,
+    runAnalysis,
+    reset,
+  } = useReportPipeline();
 
-  const onFile = async (file: File) => {
-    if (!file.type.startsWith("text/") && !file.name.endsWith(".txt")) {
-      toast.error("Please upload a plain .txt file. For PDFs, copy and paste the text.");
-      return;
+  const handleAnalyze = async (
+    text: string,
+    fileName?: string,
+    sourceKind?: "paste" | "txt" | "pdf" | "demo",
+  ) => {
+    setLastSourceText(text);
+    const title =
+      fileName?.replace(/\.[^.]+$/, "") ||
+      `Report Analysis · ${new Date().toLocaleDateString()}`;
+    setReportTitle(title);
+
+    const out = await runAnalysis(text, fileName, sourceKind);
+    if (out) {
+      // Background save to Supabase history
+      saveAnalysis({
+        kind: "report",
+        title,
+        input: text,
+        result: out,
+      })
+        .then(() => {
+          qc.invalidateQueries({ queryKey: ["analyses"] });
+        })
+        .catch((err) => {
+          console.warn("Failed to auto-save analysis to Supabase:", err);
+        });
     }
-    const t = await file.text();
-    setText(t);
-    if (!title) setTitle(file.name.replace(/\.[^.]+$/, ""));
   };
 
+  const handleReset = () => {
+    reset();
+    setReportTitle("");
+    setLastSourceText("");
+    setActiveTab("findings");
+  };
+
+  const isAnalyzing = status === "EXTRACTING" || status === "VERIFYING";
+
   return (
-    <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6">
-      <div className="flex items-center gap-3">
-        <div className="flex h-10 w-10 items-center justify-center rounded-lg brand-gradient text-white">
-          <FileText className="h-5 w-5" />
-        </div>
-        <div>
-          <h1 className="text-2xl font-bold">Medical Report Analyzer</h1>
-          <p className="text-sm text-muted-foreground">
-            Paste or upload report text. We'll summarize key findings.
-          </p>
-        </div>
-      </div>
-
-      <Disclaimer className="mt-6" />
-
-      <div className="mt-6 grid gap-6 lg:grid-cols-2">
-        <div className="rounded-2xl border border-border bg-card p-5">
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="title">Title (optional)</Label>
-              <input
-                id="title"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="e.g. Blood test — Oct 2025"
-                className="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-              />
-            </div>
-            <div>
-              <Label htmlFor="report">Report text</Label>
-              <Textarea
-                id="report"
-                value={text}
-                onChange={(e) => setText(e.target.value)}
-                placeholder="Paste your medical report text here…"
-                className="mt-1 min-h-[260px]"
-              />
-            </div>
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <label className="inline-flex cursor-pointer items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
-                <Upload className="h-4 w-4" />
-                <span>Upload .txt</span>
-                <input
-                  type="file"
-                  accept=".txt,text/plain"
-                  className="hidden"
-                  onChange={(e) => e.target.files?.[0] && onFile(e.target.files[0])}
-                />
-              </label>
-              <Button
-                onClick={() => m.mutate()}
-                disabled={text.trim().length < 20 || m.isPending}
-                className="brand-gradient text-white"
-              >
-                {m.isPending ? "Analyzing…" : "Analyze report"}
-              </Button>
-            </div>
+    <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
+      {/* Header */}
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border pb-6">
+        <div className="flex items-center gap-3">
+          <div className="flex h-11 w-11 items-center justify-center rounded-xl brand-gradient text-white shadow-sm">
+            <FileText className="h-6 w-6" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight">Report Intelligence Lens</h1>
+            <p className="text-sm text-muted-foreground">
+              Extracts medical findings, locks verbatim quotes to source text, and evaluates ranges deterministically.
+            </p>
           </div>
         </div>
 
-        <div className="rounded-2xl border border-border bg-card p-5">
-          {!result ? (
-            <div className="flex h-full min-h-[300px] items-center justify-center text-center text-sm text-muted-foreground">
-              The structured analysis will appear here.
+        {analysis && (
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" onClick={handleReset}>
+              <RotateCcw className="mr-1.5 h-3.5 w-3.5" /> New Analysis
+            </Button>
+          </div>
+        )}
+      </div>
+
+      <Disclaimer className="mt-4" />
+
+      {/* Main View: Input vs Results */}
+      {!analysis ? (
+        <div className="mt-8 space-y-8">
+          <ReportInput isLoading={isAnalyzing} onAnalyze={handleAnalyze} />
+
+          {/* Verification Lab Showcase */}
+          <div className="mt-12">
+            <div className="mb-3">
+              <h2 className="text-lg font-semibold tracking-tight">
+                Try the Live Evidence & Tamper Engine
+              </h2>
+              <p className="text-xs text-muted-foreground">
+                See how deterministic quote matching prevents AI hallucinations and invalid claims without sending data to any LLM.
+              </p>
             </div>
-          ) : (
-            <ReportView r={result} />
+            <VerificationLab />
+          </div>
+        </div>
+      ) : (
+        <div className="mt-6 space-y-6">
+          {/* Summary Strip */}
+          <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-border bg-card p-4 shadow-sm">
+            <div>
+              <div className="flex items-center gap-2">
+                <h2 className="font-semibold text-foreground">{reportTitle}</h2>
+                <span className="rounded bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
+                  v{analysis.schemaVersion} Verified
+                </span>
+              </div>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                Analyzed {analysis.pipeline.findings.length} findings in{" "}
+                {analysis.pipeline.trace.reduce((acc, t) => acc + t.ms, 0)} ms ·{" "}
+                {analysis.pipeline.stats.verified} locked quotes
+              </p>
+            </div>
+
+            {/* Quick Metrics */}
+            <div className="flex items-center gap-4 text-xs">
+              <div className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-medium">
+                <ShieldCheck className="h-4 w-4" />
+                <span>{analysis.pipeline.stats.verified} Verified</span>
+              </div>
+              {analysis.pipeline.stats.flagged > 0 && (
+                <div className="flex items-center gap-1.5 text-rose-500 font-medium">
+                  <AlertTriangle className="h-4 w-4" />
+                  <span>{analysis.pipeline.stats.flagged} Flagged</span>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Navigation Tabs */}
+          <div className="flex flex-wrap items-center gap-2 border-b border-border pb-1">
+            <TabButton
+              active={activeTab === "findings"}
+              onClick={() => setActiveTab("findings")}
+              icon={<Layers className="h-4 w-4" />}
+              label={`Findings & Evidence (${analysis.pipeline.findings.length})`}
+            />
+            <TabButton
+              active={activeTab === "brief"}
+              onClick={() => setActiveTab("brief")}
+              icon={<FileCheck className="h-4 w-4" />}
+              label="Doctor Visit Brief"
+            />
+            <TabButton
+              active={activeTab === "trace"}
+              onClick={() => setActiveTab("trace")}
+              icon={<Activity className="h-4 w-4" />}
+              label="Pipeline Telemetry"
+            />
+            <TabButton
+              active={activeTab === "lab"}
+              onClick={() => setActiveTab("lab")}
+              icon={<FlaskConical className="h-4 w-4" />}
+              label="Tamper Lab"
+            />
+          </div>
+
+          {/* Tab 1: Findings & Evidence (Table + Split Inspector) */}
+          {activeTab === "findings" && (
+            <div className="space-y-6">
+              <FindingsTable
+                findings={analysis.pipeline.findings}
+                selectedFindingId={selectedFindingId}
+                onSelectFinding={setSelectedFindingId}
+              />
+
+              <div className="grid gap-6 lg:grid-cols-2">
+                <div>
+                  <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    Finding Evidence Audit
+                  </h3>
+                  <FindingDetail finding={selectedFinding} />
+                </div>
+
+                <div>
+                  <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    Source Document Span
+                  </h3>
+                  <div className="max-h-[500px] overflow-auto rounded-xl border border-border bg-card p-4 shadow-sm font-mono text-xs">
+                    <SourceViewer
+                      sourceText={lastSourceText || analysis.source.fileName || ""}
+                      evidence={selectedFinding?.evidence ?? null}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Tab 2: Doctor Brief */}
+          {activeTab === "brief" && (
+            analysis.brief ? (
+              <DoctorBriefView brief={analysis.brief} />
+            ) : (
+              <div className="rounded-xl border border-border p-8 text-center text-sm text-muted-foreground">
+                Doctor visit brief is not available for this report.
+              </div>
+            )
+          )}
+
+          {/* Tab 3: Pipeline Telemetry */}
+          {activeTab === "trace" && (
+            <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
+              <PipelineTrace pipeline={analysis.pipeline} />
+            </div>
+          )}
+
+          {/* Tab 4: Tamper Lab */}
+          {activeTab === "lab" && (
+            <VerificationLab />
           )}
         </div>
-      </div>
+      )}
     </div>
   );
 }
 
-function ReportView({ r }: { r: ReportResult }) {
-  return (
-    <div className="space-y-5 text-sm">
-      <section>
-        <h3 className="text-base font-semibold">Summary</h3>
-        <p className="mt-1 text-muted-foreground">{r.summary}</p>
-      </section>
-      {r.key_findings.length > 0 && (
-        <Section title="Key findings" icon={<CheckCircle2 className="h-4 w-4" />}>
-          <ul className="list-disc space-y-1 pl-5 text-muted-foreground">
-            {r.key_findings.map((f, i) => (
-              <li key={i}>{f}</li>
-            ))}
-          </ul>
-        </Section>
-      )}
-      {r.abnormal_values.length > 0 && (
-        <Section title="Abnormal values">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left">
-              <thead className="text-xs uppercase text-muted-foreground">
-                <tr>
-                  <th className="py-1 pr-3">Name</th>
-                  <th className="py-1 pr-3">Value</th>
-                  <th className="py-1 pr-3">Reference</th>
-                  <th className="py-1">Note</th>
-                </tr>
-              </thead>
-              <tbody>
-                {r.abnormal_values.map((v, i) => (
-                  <tr key={i} className="border-t border-border">
-                    <td className="py-1 pr-3 font-medium">{v.name}</td>
-                    <td className="py-1 pr-3">{v.value}</td>
-                    <td className="py-1 pr-3 text-muted-foreground">{v.reference ?? "—"}</td>
-                    <td className="py-1 text-muted-foreground">{v.note ?? "—"}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </Section>
-      )}
-      {r.recommendations.length > 0 && (
-        <Section title="Suggested next steps">
-          <ul className="list-disc space-y-1 pl-5 text-muted-foreground">
-            {r.recommendations.map((f, i) => (
-              <li key={i}>{f}</li>
-            ))}
-          </ul>
-        </Section>
-      )}
-      {r.red_flags.length > 0 && (
-        <Section title="Seek care if…" icon={<AlertOctagon className="h-4 w-4 text-destructive" />}>
-          <ul className="list-disc space-y-1 pl-5 text-destructive">
-            {r.red_flags.map((f, i) => (
-              <li key={i}>{f}</li>
-            ))}
-          </ul>
-        </Section>
-      )}
-      <p className="border-t border-border pt-3 text-xs text-muted-foreground">{r.disclaimer}</p>
-    </div>
-  );
-}
-
-function Section({
-  title,
+function TabButton({
+  active,
+  onClick,
   icon,
-  children,
+  label,
 }: {
-  title: string;
-  icon?: React.ReactNode;
-  children: React.ReactNode;
+  active: boolean;
+  onClick: () => void;
+  icon: React.ReactNode;
+  label: string;
 }) {
   return (
-    <section>
-      <h3 className="flex items-center gap-2 text-base font-semibold">
-        {icon} {title}
-      </h3>
-      <div className="mt-2">{children}</div>
-    </section>
+    <button
+      type="button"
+      onClick={onClick}
+      className={`inline-flex items-center gap-2 rounded-lg px-3.5 py-2 text-xs font-medium transition-all ${
+        active
+          ? "bg-primary text-primary-foreground shadow-sm"
+          : "text-muted-foreground hover:bg-muted hover:text-foreground"
+      }`}
+    >
+      {icon}
+      {label}
+    </button>
   );
 }

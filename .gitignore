@@ -1,0 +1,34 @@
+# ─── Dependencies ───────────────────────────────────────────
+node_modules/
+
+# ─── Environment ────────────────────────────────────────────
+.env
+.env.local
+.env.*.local
+
+# ─── Build output ───────────────────────────────────────────
+.output/
+dist/
+.vinxi/
+.nitro/
+.wrangler/
+
+# ─── Editor / OS ────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+.idea/
+.vscode/
+*.code-workspace
+
+# ─── Logs ───────────────────────────────────────────────────
+*.log
+npm-debug.log*
+
+# ─── Test coverage ──────────────────────────────────────────
+coverage/
+
+# ─── npm cache (redirected to F drive) ──────────────────────
+npm-cache/

@@ -5,7 +5,7 @@ import { Disclaimer } from "@/components/Disclaimer";
 import { Button } from "@/components/ui/button";
 import { listAnalyses, deleteAllAnalyses } from "@/lib/analyses";
 import { useAuth } from "@/lib/auth-context";
-import { FileText, Stethoscope, History as HistoryIcon, Trash2 } from "lucide-react";
+import { FileText, Pill, History as HistoryIcon, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
 
@@ -55,10 +55,10 @@ function Dashboard() {
           desc="Paste a lab or radiology report"
         />
         <QuickAction
-          to="/symptoms"
-          icon={<Stethoscope className="h-5 w-5" />}
-          title="Check symptoms"
-          desc="Describe what you're feeling"
+          to="/medicines"
+          icon={<Pill className="h-5 w-5" />}
+          title="Medicine Lens"
+          desc="Verify packaging and ingredients"
         />
         <QuickAction
           to="/history"
@@ -92,12 +92,16 @@ function Dashboard() {
           ) : analyses.length === 0 ? (
             <div className="p-10 text-center text-sm text-muted-foreground">
               No analyses yet. Try the{" "}
-              <Link className="underline" to="/analyzer">
+              <Link className="underline font-medium text-primary" to="/analyzer">
                 Report Analyzer
-              </Link>{" "}
-              or{" "}
-              <Link className="underline" to="/symptoms">
-                Symptom Checker
+              </Link>
+              ,{" "}
+              <Link className="underline font-medium text-primary" to="/medicines">
+                Medicine Lens
+              </Link>
+              , or try the{" "}
+              <Link className="underline font-medium text-primary" to="/demo">
+                Demo Lab
               </Link>
               .
             </div>

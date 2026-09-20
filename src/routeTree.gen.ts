@@ -9,12 +9,12 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as SymptomsRouteImport } from './routes/symptoms'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as MedicinesRouteImport } from './routes/medicines'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as HistoryRouteImport } from './routes/history'
+import { Route as DemoRouteImport } from './routes/demo'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AnalyzerRouteImport } from './routes/analyzer'
@@ -22,11 +22,6 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 
-const SymptomsRoute = SymptomsRouteImport.update({
-  id: '/symptoms',
-  path: '/symptoms',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -50,6 +45,11 @@ const LoginRoute = LoginRouteImport.update({
 const HistoryRoute = HistoryRouteImport.update({
   id: '/history',
   path: '/history',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DemoRoute = DemoRouteImport.update({
+  id: '/demo',
+  path: '/demo',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardRoute = DashboardRouteImport.update({
@@ -89,12 +89,12 @@ export interface FileRoutesByFullPath {
   '/analyzer': typeof AnalyzerRoute
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRoute
+  '/demo': typeof DemoRoute
   '/history': typeof HistoryRoute
   '/login': typeof LoginRoute
   '/medicines': typeof MedicinesRoute
   '/profile': typeof ProfileRoute
   '/settings': typeof SettingsRoute
-  '/symptoms': typeof SymptomsRoute
   '/auth/callback': typeof AuthCallbackRoute
 }
 export interface FileRoutesByTo {
@@ -103,12 +103,12 @@ export interface FileRoutesByTo {
   '/analyzer': typeof AnalyzerRoute
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRoute
+  '/demo': typeof DemoRoute
   '/history': typeof HistoryRoute
   '/login': typeof LoginRoute
   '/medicines': typeof MedicinesRoute
   '/profile': typeof ProfileRoute
   '/settings': typeof SettingsRoute
-  '/symptoms': typeof SymptomsRoute
   '/auth/callback': typeof AuthCallbackRoute
 }
 export interface FileRoutesById {
@@ -118,12 +118,12 @@ export interface FileRoutesById {
   '/analyzer': typeof AnalyzerRoute
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRoute
+  '/demo': typeof DemoRoute
   '/history': typeof HistoryRoute
   '/login': typeof LoginRoute
   '/medicines': typeof MedicinesRoute
   '/profile': typeof ProfileRoute
   '/settings': typeof SettingsRoute
-  '/symptoms': typeof SymptomsRoute
   '/auth/callback': typeof AuthCallbackRoute
 }
 export interface FileRouteTypes {
@@ -134,12 +134,12 @@ export interface FileRouteTypes {
     | '/analyzer'
     | '/contact'
     | '/dashboard'
+    | '/demo'
     | '/history'
     | '/login'
     | '/medicines'
     | '/profile'
     | '/settings'
-    | '/symptoms'
     | '/auth/callback'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -148,12 +148,12 @@ export interface FileRouteTypes {
     | '/analyzer'
     | '/contact'
     | '/dashboard'
+    | '/demo'
     | '/history'
     | '/login'
     | '/medicines'
     | '/profile'
     | '/settings'
-    | '/symptoms'
     | '/auth/callback'
   id:
     | '__root__'
@@ -162,12 +162,12 @@ export interface FileRouteTypes {
     | '/analyzer'
     | '/contact'
     | '/dashboard'
+    | '/demo'
     | '/history'
     | '/login'
     | '/medicines'
     | '/profile'
     | '/settings'
-    | '/symptoms'
     | '/auth/callback'
   fileRoutesById: FileRoutesById
 }
@@ -177,24 +177,17 @@ export interface RootRouteChildren {
   AnalyzerRoute: typeof AnalyzerRoute
   ContactRoute: typeof ContactRoute
   DashboardRoute: typeof DashboardRoute
+  DemoRoute: typeof DemoRoute
   HistoryRoute: typeof HistoryRoute
   LoginRoute: typeof LoginRoute
   MedicinesRoute: typeof MedicinesRoute
   ProfileRoute: typeof ProfileRoute
   SettingsRoute: typeof SettingsRoute
-  SymptomsRoute: typeof SymptomsRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/symptoms': {
-      id: '/symptoms'
-      path: '/symptoms'
-      fullPath: '/symptoms'
-      preLoaderRoute: typeof SymptomsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/settings': {
       id: '/settings'
       path: '/settings'
@@ -228,6 +221,13 @@ declare module '@tanstack/react-router' {
       path: '/history'
       fullPath: '/history'
       preLoaderRoute: typeof HistoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/demo': {
+      id: '/demo'
+      path: '/demo'
+      fullPath: '/demo'
+      preLoaderRoute: typeof DemoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard': {
@@ -281,12 +281,12 @@ const rootRouteChildren: RootRouteChildren = {
   AnalyzerRoute: AnalyzerRoute,
   ContactRoute: ContactRoute,
   DashboardRoute: DashboardRoute,
+  DemoRoute: DemoRoute,
   HistoryRoute: HistoryRoute,
   LoginRoute: LoginRoute,
   MedicinesRoute: MedicinesRoute,
   ProfileRoute: ProfileRoute,
   SettingsRoute: SettingsRoute,
-  SymptomsRoute: SymptomsRoute,
   AuthCallbackRoute: AuthCallbackRoute,
 }
 export const routeTree = rootRouteImport

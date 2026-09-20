@@ -5,10 +5,9 @@ export type AnalysisKind = "report" | "symptom" | "medicine";
 export interface AnalysisRow {
   id: string;
   user_id: string;
-  type: AnalysisKind;
+  kind: AnalysisKind;
   title: string;
-  input_text: string;
-  file_path?: string | null;
+  input: string;
   result: unknown;
   created_at: string;
 }
@@ -28,9 +27,9 @@ export async function saveAnalysis(input: {
     .from("analyses")
     .insert({
       user_id: user.id,
-      type: input.kind,
+      kind: input.kind,
       title: input.title,
-      input_text: input.input,
+      input: input.input,
       result: input.result,
     })
     .select()

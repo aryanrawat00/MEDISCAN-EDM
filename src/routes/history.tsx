@@ -7,6 +7,7 @@ import { listAnalyses, deleteAnalysis, type AnalysisRow } from "@/lib/analyses";
 import { toast } from "sonner";
 import { Trash2, ChevronDown, ChevronRight } from "lucide-react";
 import { format } from "date-fns";
+import { ResultView } from "@/components/history/ResultView";
 
 export const Route = createFileRoute("/history")({
   head: () => ({ meta: [{ title: "History — MediScan AI" }] }),
@@ -90,20 +91,34 @@ function History() {
 }
 
 function Detail({ a }: { a: AnalysisRow }) {
+  const [showInput, setShowInput] = useState(false);
+
   return (
-    <div className="mt-3 space-y-3 rounded-lg bg-muted/40 p-4 text-sm">
-      <div>
-        <p className="text-xs font-medium uppercase text-muted-foreground">Input</p>
-        <pre className="mt-1 max-h-40 overflow-auto whitespace-pre-wrap text-foreground">
-          {a.input}
-        </pre>
+    <div className="mt-4 space-y-4 rounded-xl border border-border bg-card p-5 text-sm shadow-sm">
+      <div className="flex items-center justify-between border-b border-border pb-3">
+        <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+          Analysis Result
+        </span>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="text-xs h-7"
+          onClick={() => setShowInput(!showInput)}
+        >
+          {showInput ? "Hide Source Input" : "Show Source Input"}
+        </Button>
       </div>
-      <div>
-        <p className="text-xs font-medium uppercase text-muted-foreground">Result</p>
-        <pre className="mt-1 max-h-96 overflow-auto whitespace-pre-wrap text-foreground">
-          {JSON.stringify(a.result, null, 2)}
-        </pre>
-      </div>
+
+      {showInput && (
+        <div className="rounded-lg bg-muted/40 p-3">
+          <p className="text-xs font-semibold text-muted-foreground">Source Input</p>
+          <pre className="mt-1 max-h-48 overflow-auto whitespace-pre-wrap font-mono text-xs text-foreground">
+            {a.input}
+          </pre>
+        </div>
+      )}
+
+      <ResultView kind={a.kind} result={a.result} />
     </div>
   );
 }

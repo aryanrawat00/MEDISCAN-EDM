@@ -2,7 +2,7 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { useAuth } from "@/lib/auth-context";
 import { useTheme } from "@/lib/theme-context";
 import { Button } from "@/components/ui/button";
-import { Moon, Sun, Stethoscope, Settings, LogOut, FileText, Pill, History as HistoryIcon, LayoutDashboard, Info, Mail } from "lucide-react";
+import { Moon, Sun, Stethoscope, Settings, LogOut, FileText, Pill, History as HistoryIcon, LayoutDashboard, Info, Mail, Sparkles } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -33,12 +33,11 @@ export function Navbar() {
 
         <nav className="hidden items-center gap-1 md:flex">
           {user && <NavLink to="/dashboard"><LayoutDashboard className="mr-1 h-4 w-4" /> Dashboard</NavLink>}
-          <NavLink to="/analyzer"><FileText className="mr-1 h-4 w-4" /> Analyzer</NavLink>
-          <NavLink to="/symptoms"><Stethoscope className="mr-1 h-4 w-4" /> Symptoms</NavLink>
-          <NavLink to="/medicines"><Pill className="mr-1 h-4 w-4" /> Medicines</NavLink>
+          <NavLink to="/analyzer"><FileText className="mr-1 h-4 w-4" /> Report Analyzer</NavLink>
+          <NavLink to="/medicines"><Pill className="mr-1 h-4 w-4" /> Medicine Lens</NavLink>
+          <NavLink to="/demo"><Sparkles className="mr-1 h-4 w-4 text-amber-500" /> Demo Lab</NavLink>
           {user && <NavLink to="/history"><HistoryIcon className="mr-1 h-4 w-4" /> History</NavLink>}
           <NavLink to="/about"><Info className="mr-1 h-4 w-4" /> About</NavLink>
-          <NavLink to="/contact"><Mail className="mr-1 h-4 w-4" /> Contact</NavLink>
         </nav>
 
 

@@ -47,12 +47,12 @@ function Landing() {
             <Sparkles className="h-3.5 w-3.5" /> Powered by Google Gemini
           </span>
           <h1 className="mt-6 text-balance text-5xl font-bold tracking-tight sm:text-7xl">
-            Understand your health,{" "}
-            <span className="brand-text-gradient">intelligently</span>.
+            Understand your reports.{" "}
+            <span className="brand-text-gradient">Know your medicines</span>.
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground sm:text-xl">
-            MediScan AI helps you read medical reports, explore symptoms and look up
-            medicines in plain language — so you walk into your next appointment prepared.
+            Evidence first. AI second. MediScan verifies medical reports against printed reference ranges
+            and identifies OTC medicines from verified package text.
           </p>
           <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
             <Button asChild size="lg" className="brand-gradient text-white">
@@ -61,7 +61,10 @@ function Landing() {
               </Link>
             </Button>
             <Button asChild size="lg" variant="outline">
-              <Link to="/analyzer">Try the analyzer</Link>
+              <Link to="/analyzer">Analyze a report</Link>
+            </Button>
+            <Button asChild size="lg" variant="outline">
+              <Link to="/medicines">Medicine Lens</Link>
             </Button>
           </div>
           <p className="mt-4 text-xs text-muted-foreground">
@@ -73,44 +76,39 @@ function Landing() {
       {/* Stats strip */}
       <section className="border-y border-border bg-card/40">
         <div className="mx-auto grid max-w-6xl grid-cols-2 gap-6 px-6 py-10 md:grid-cols-4">
-          <Stat value="4" label="AI tools" />
-          <Stat value="<5s" label="Average response" />
+          <Stat value="2" label="Evidence Lenses" />
+          <Stat value="100%" label="Deterministic Rules" />
           <Stat value="100%" label="Private to you" />
-          <Stat value="24/7" label="Always available" />
+          <Stat value="0" label="Guessed Lab Values" />
         </div>
       </section>
 
       {/* Features */}
       <section className="mx-auto max-w-6xl px-6 py-24">
         <SectionHeader
-          eyebrow="What's inside"
+          eyebrow="Two Evidence Lenses"
           title={
             <>
-              Four tools, one <span className="brand-text-gradient">clear</span> answer.
+              Evidence first. AI second. <span className="brand-text-gradient">No guessing</span>.
             </>
           }
-          desc="Each tool turns dense medical language into something you can actually act on."
+          desc="AI reads prose. Code verifies quotes, calculates ranges, and looks up official reference labels."
         />
-        <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-12 grid gap-6 md:grid-cols-3">
           <Feature
             icon={<FileText className="h-5 w-5" />}
-            title="Report Analyzer"
-            desc="Paste lab results and get a structured summary, abnormal values and questions to ask."
-          />
-          <Feature
-            icon={<Stethoscope className="h-5 w-5" />}
-            title="Symptom Checker"
-            desc="Describe how you feel. Get possible directions, self-care tips and red flags."
+            title="Report Lens"
+            desc="Extracts lab values from PDF or text, validates quotes verbatim, and classifies LOW/NORMAL/HIGH from printed ranges."
           />
           <Feature
             icon={<Pill className="h-5 w-5" />}
-            title="Medicine Lookup"
-            desc="Search any medicine for uses, dosage, side effects, interactions and warnings."
+            title="Medicine Lens"
+            desc="Identifies active ingredients from packaging transcripts and matches official FDA drug labels with full provenance."
           />
           <Feature
             icon={<HistoryIcon className="h-5 w-5" />}
-            title="History"
-            desc="Every analysis is saved to your private history — revisit and compare anytime."
+            title="Personal History"
+            desc="Every verified analysis is saved to your private encrypted history — revisit and review anytime."
           />
         </div>
       </section>
