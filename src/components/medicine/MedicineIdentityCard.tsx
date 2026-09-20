@@ -9,10 +9,15 @@ import { ShieldCheck, AlertTriangle, HelpCircle, XCircle, CheckCircle2, Pill } f
 
 interface MedicineIdentityCardProps {
   scan: MedicineScanV3;
+  onAddToChecker?: () => void;
   className?: string;
 }
 
-export function MedicineIdentityCard({ scan, className = "" }: MedicineIdentityCardProps) {
+export function MedicineIdentityCard({
+  scan,
+  onAddToChecker,
+  className = "",
+}: MedicineIdentityCardProps) {
   const { status, statusReason, brandName, dosageForm, monographs } = scan;
 
   return (
@@ -37,13 +42,26 @@ export function MedicineIdentityCard({ scan, className = "" }: MedicineIdentityC
           </div>
         </div>
 
-        {/* Monograph count badge */}
-        {monographs.length > 0 && (
-          <div className="rounded-lg bg-emerald-500/10 px-3 py-1.5 text-xs font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
-            <ShieldCheck className="h-4 w-4" />
-            <span>{monographs.length} Approved openFDA Monograph{monographs.length > 1 ? "s" : ""}</span>
-          </div>
-        )}
+        <div className="flex flex-wrap items-center gap-2">
+          {onAddToChecker && (
+            <button
+              type="button"
+              onClick={onAddToChecker}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-primary/40 bg-primary/5 px-3 py-1.5 text-xs font-semibold text-primary hover:bg-primary/10 transition-colors"
+            >
+              <Pill className="h-3.5 w-3.5" />
+              <span>Add to Interaction Check</span>
+            </button>
+          )}
+
+          {/* Monograph count badge */}
+          {monographs.length > 0 && (
+            <div className="rounded-lg bg-emerald-500/10 px-3 py-1.5 text-xs font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
+              <ShieldCheck className="h-4 w-4" />
+              <span>{monographs.length} Approved openFDA Monograph{monographs.length > 1 ? "s" : ""}</span>
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="mt-4 rounded-lg bg-muted/40 p-3 text-xs">

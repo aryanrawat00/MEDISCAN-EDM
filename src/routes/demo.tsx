@@ -268,7 +268,10 @@ function DemoPage() {
 
           {/* SubTab 2: Doctor Brief */}
           {reportSubTab === "brief" && (
-            <DoctorBriefView brief={doctorBrief} />
+            <DoctorBriefView
+              brief={doctorBrief}
+              reportName="Sample CBC & Metabolic Panel"
+            />
           )}
 
           {/* SubTab 3: Telemetry */}

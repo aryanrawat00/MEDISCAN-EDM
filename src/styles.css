@@ -144,3 +144,56 @@
   background-clip: text;
   color: transparent;
 }
+
+/* ==========================================================================
+   Clinical Appointment Print Styles (Save as PDF & Physical Printing)
+   ========================================================================== */
+@media print {
+  @page {
+    margin: 12mm 15mm 12mm 15mm;
+    size: auto;
+  }
+
+  body {
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+    font-size: 11pt !important;
+    line-height: 1.4 !important;
+  }
+
+  header,
+  nav,
+  footer,
+  aside,
+  button,
+  input,
+  [role="dialog"],
+  .sonner-toast,
+  [data-sonner-toaster] {
+    display: none !important;
+  }
+
+  main {
+    padding: 0 !important;
+    margin: 0 !important;
+    max-width: 100% !important;
+  }
+
+  table {
+    page-break-inside: avoid;
+  }
+
+  tr {
+    page-break-inside: avoid;
+    page-break-after: auto;
+  }
+
+  h1, h2, h3, h4 {
+    page-break-after: avoid;
+  }
+
+  .print-break-inside-avoid {
+    page-break-inside: avoid;
+  }
+}
+
