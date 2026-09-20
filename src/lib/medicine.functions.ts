@@ -7,7 +7,7 @@
 
 import { createServerFn } from "@tanstack/react-start";
 import { generateText } from "ai";
-import { requireUser } from "./auth.middleware";
+import { resolveUserOrGuest } from "./auth.middleware";
 import { withModelFallback } from "./shared/model.server";
 import { Result, okResult, errResult } from "./shared/result";
 import { MedicineScanV3 } from "./medicine/types";
@@ -26,7 +26,7 @@ function stripJson(text: string): string {
 }
 
 export const scanMedicine = createServerFn({ method: "POST" })
-  .middleware([requireUser])
+  .middleware([resolveUserOrGuest])
   .inputValidator((d: unknown) => ScanMedicineInputSchema.parse(d))
   .handler(async ({ data }): Promise<Result<MedicineScanV3>> => {
     try {

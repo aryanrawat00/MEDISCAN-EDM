@@ -5,10 +5,10 @@
  * "Evidence first. AI second. Code decides."
  */
 
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, useRef } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { AuthGate } from "@/components/AuthGate";
+import { useAuth } from "@/lib/auth-context";
 import { Disclaimer } from "@/components/Disclaimer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,6 +19,7 @@ import { PackagingEvidenceViewer } from "@/components/medicine/PackagingEvidence
 import { useMedicineScan } from "@/hooks/useMedicineScan";
 import { MEDICINE_SAMPLES, MedicineSample } from "@/lib/medicine/samples";
 import { searchReferenceMonographs } from "@/lib/medicine/reference";
+import { MedicineReferenceEntry } from "@/lib/medicine/reference.data";
 import { saveAnalysis } from "@/lib/analyses";
 import {
   Pill,
@@ -32,26 +33,25 @@ import {
   FileText,
   ShieldCheck,
   Loader2,
+  LogIn,
+  X,
 } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/medicines")({
   head: () => ({ meta: [{ title: "Medicine Lens — MediScan AI" }] }),
-  component: () => (
-    <AuthGate>
-      <MedicineLens />
-    </AuthGate>
-  ),
+  component: () => <MedicineLens />,
 });
 
 type MedicineTab = "ingredients" | "monograph" | "evidence";
 
 function MedicineLens() {
+  const { user } = useAuth();
   const qc = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [activeTab, setActiveTab] = useState<MedicineTab>("ingredients");
   const [searchQuery, setSearchQuery] = useState("");
-  const [isSearching, setIsSearching] = useState(false);
+  const [selectedMonograph, setSelectedMonograph] = useState<MedicineReferenceEntry | null>(null);
 
   const {
     status,
@@ -74,34 +74,42 @@ function MedicineLens() {
       return;
     }
 
+    setSelectedMonograph(null);
     const out = await scanFile(file);
     if (out) {
       const title =
         out.brandName ||
         (out.monographs[0]?.displayName ?? `Medicine Scan · ${new Date().toLocaleDateString()}`);
 
-      saveAnalysis({
-        kind: "medicine",
-        title,
-        input: out.transcribedText || file.name,
-        result: out,
-      })
-        .then(() => {
-          qc.invalidateQueries({ queryKey: ["analyses"] });
+      if (user) {
+        saveAnalysis({
+          kind: "medicine",
+          title,
+          input: out.transcribedText || file.name,
+          result: out,
         })
-        .catch((err) => {
-          console.warn("Failed to auto-save medicine scan:", err);
-        });
+          .then(() => {
+            qc.invalidateQueries({ queryKey: ["analyses"] });
+            toast.success("Medicine scan saved to your private history.");
+          })
+          .catch((err) => {
+            console.warn("Failed to auto-save medicine scan:", err);
+          });
+      } else {
+        toast.info("Scan completed in Guest Mode. Sign in anytime to save your results to permanent history.");
+      }
     }
   };
 
   const handleSelectSample = (s: MedicineSample) => {
+    setSelectedMonograph(null);
     loadScan(s.precomputedScan);
     toast.success(`Loaded sample: ${s.title}`);
   };
 
   const handleReset = () => {
     reset();
+    setSelectedMonograph(null);
     setActiveTab("ingredients");
     setSearchQuery("");
   };
@@ -113,8 +121,27 @@ function MedicineLens() {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
+      {/* Guest Mode Banner */}
+      {!user && (
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border/80 bg-muted/40 px-4 py-3 text-xs text-foreground print:hidden">
+          <div className="flex items-center gap-2">
+            <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-0.5 font-semibold text-primary">
+              <Sparkles className="h-3 w-3" /> Guest Session
+            </span>
+            <span className="text-muted-foreground">
+              Live medicine packaging vision and openFDA monograph lookup active. Results remain in session memory.
+            </span>
+          </div>
+          <Button asChild size="sm" variant="outline" className="h-7 text-xs">
+            <Link to="/login">
+              <LogIn className="mr-1.5 h-3 w-3" /> Sign in to save history
+            </Link>
+          </Button>
+        </div>
+      )}
+
       {/* Header */}
-      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border pb-6">
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border pb-6 print:hidden">
         <div className="flex items-center gap-3">
           <div className="flex h-11 w-11 items-center justify-center rounded-xl brand-gradient text-white shadow-sm">
             <Pill className="h-6 w-6" />
@@ -127,14 +154,14 @@ function MedicineLens() {
           </div>
         </div>
 
-        {scan && (
+        {(scan || selectedMonograph) && (
           <Button variant="outline" size="sm" onClick={handleReset}>
-            <RotateCcw className="mr-1.5 h-3.5 w-3.5" /> New Scan
+            <RotateCcw className="mr-1.5 h-3.5 w-3.5" /> New Lookup / Scan
           </Button>
         )}
       </div>
 
-      <Disclaimer className="mt-4" />
+      <Disclaimer className="mt-4 print:hidden" />
 
       {/* Main Content Area */}
       {!scan ? (
@@ -221,14 +248,8 @@ function MedicineLens() {
                     <div
                       key={m.key}
                       onClick={() => {
-                        const sampleMatch = MEDICINE_SAMPLES.find((s) =>
-                          s.title.toLowerCase().includes(m.key),
-                        );
-                        if (sampleMatch) {
-                          loadScan(sampleMatch.precomputedScan);
-                        } else {
-                          toast.info(`Loaded reference for ${m.displayName}`);
-                        }
+                        setSelectedMonograph(m);
+                        toast.success(`Loaded FDA monograph: ${m.displayName}`);
                       }}
                       className="p-3 hover:bg-muted/40 cursor-pointer transition-colors text-xs"
                     >
@@ -251,6 +272,37 @@ function MedicineLens() {
               )}
             </div>
           </div>
+
+          {/* Active Monograph Inspector (from direct reference browsing) */}
+          {selectedMonograph && (
+            <div className="rounded-2xl border border-primary/30 bg-card p-6 shadow-sm space-y-4">
+              <div className="flex items-center justify-between border-b border-border pb-3">
+                <div className="flex items-center gap-2">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                    <Bookmark className="h-4 w-4" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-base text-foreground">
+                      Approved openFDA Monograph: {selectedMonograph.displayName}
+                    </h3>
+                    <p className="text-xs text-muted-foreground">
+                      Official OTC monograph snapshot · Zero AI hallucination
+                    </p>
+                  </div>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setSelectedMonograph(null)}
+                  className="h-8 px-2 text-xs"
+                >
+                  <X className="mr-1 h-3.5 w-3.5" /> Close View
+                </Button>
+              </div>
+
+              <MonographView monographs={[selectedMonograph]} />
+            </div>
+          )}
 
           {/* Quick Pre-Verified Samples Strip */}
           <div className="space-y-3">

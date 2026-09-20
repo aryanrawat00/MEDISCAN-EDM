@@ -36,7 +36,7 @@ function LoginPage() {
         )}
 
         <Button
-          className="mt-8 w-full"
+          className="mt-6 w-full"
           size="lg"
           variant="outline"
           disabled={!configured || loading}
@@ -45,9 +45,30 @@ function LoginPage() {
           <GoogleIcon /> Continue with Google
         </Button>
 
-        <p className="mt-6 text-center text-xs text-muted-foreground">
-          By continuing you acknowledge MediScan AI provides educational information only and is
-          not a substitute for professional medical advice.
+        <div className="relative my-6">
+          <div className="absolute inset-0 flex items-center">
+            <span className="w-full border-t border-border/80" />
+          </div>
+          <div className="relative flex justify-center text-xs uppercase">
+            <span className="bg-card px-2 text-muted-foreground">or try instantly</span>
+          </div>
+        </div>
+
+        <Button
+          className="w-full"
+          size="lg"
+          variant="secondary"
+          onClick={() => navigate({ to: "/analyzer" })}
+        >
+          Continue as Guest
+        </Button>
+
+        <p className="mt-4 text-center text-xs text-muted-foreground">
+          Guest mode gives you full access to Report Analysis and Medicine Packaging Lens. No account required.
+        </p>
+
+        <p className="mt-6 text-center text-[11px] text-muted-foreground/80">
+          Educational use only · Never a substitute for qualified professional medical care.
         </p>
       </div>
     </div>
