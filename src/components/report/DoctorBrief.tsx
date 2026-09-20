@@ -44,7 +44,21 @@ export function DoctorBriefView({ brief, className = "" }: DoctorBriefProps) {
   };
 
   return (
-    <div className={`space-y-6 rounded-2xl border border-border bg-card p-6 shadow-sm print:border-none print:p-0 print:shadow-none ${className}`}>
+    <div className={`space-y-6 rounded-2xl border border-border bg-card p-6 shadow-sm print:border-none print:p-0 print:shadow-none print:text-black ${className}`}>
+      {/* Printable Clinical Document Header */}
+      <div className="hidden print:block border-b-2 border-slate-300 pb-3 mb-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-xl font-bold tracking-tight text-slate-900">MediScan Doctor Visit Brief</h1>
+            <p className="text-xs text-slate-600">Patient-prepared, evidence-locked clinical summary</p>
+          </div>
+          <div className="text-right text-xs text-slate-600">
+            <p>Date: {new Date(brief.generatedAt).toLocaleDateString()}</p>
+            <p className="font-medium">{brief.overview.counts.verified} Verified findings · {brief.overview.counts.flagged} Flagged</p>
+          </div>
+        </div>
+      </div>
+
       {/* Action Header */}
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border/60 pb-4 print:hidden">
         <div>
@@ -70,13 +84,13 @@ export function DoctorBriefView({ brief, className = "" }: DoctorBriefProps) {
 
       {/* Critical Alert Banner if laboratory printed critical marker */}
       {brief.criticalBanner && (
-        <div className="rounded-xl border border-rose-500/30 bg-rose-500/10 p-4 text-rose-800 dark:text-rose-300">
+        <div className="rounded-xl border border-rose-500/30 bg-rose-500/10 p-4 text-rose-800 dark:text-rose-300 print:border-rose-600 print:text-rose-900">
           <div className="flex items-center gap-2 font-semibold text-sm">
             <AlertOctagon className="h-5 w-5 text-rose-600" />
             <span>Critical Laboratory Alert Notice</span>
           </div>
           <p className="mt-1 text-xs leading-relaxed">
-            The reporting laboratory has flagged one or more values as critical or panic. Please contact your treating clinician or seeking immediate clinical advice.
+            The reporting laboratory has flagged one or more values as critical or panic. Please contact your treating clinician or seek immediate clinical advice.
           </p>
         </div>
       )}

@@ -8,11 +8,12 @@
 import { createServerFn } from "@tanstack/react-start";
 import { generateText } from "ai";
 import { z } from "zod";
-import { requireUser } from "./auth.middleware";
+import { resolveUserOrGuest } from "./auth.middleware";
 import { withModelFallback } from "./shared/model.server";
 import { REPORT_EXTRACTION_PROMPT } from "./report/prompts";
 import { extractionOutputSchema } from "./report/schemas";
 import { runReportPipeline } from "./report/pipeline";
+import { buildDoctorBrief } from "./report/brief";
 import { ReportAnalysisV2 } from "./report/types";
 import { Result, okResult, errResult } from "./shared/result";
 import { LegacyReportResult } from "./legacy";
@@ -32,7 +33,7 @@ const ReportInput = z.object({
 });
 
 export const analyzeReport = createServerFn({ method: "POST" })
-  .middleware([requireUser])
+  .middleware([resolveUserOrGuest])
   .inputValidator((d: unknown) => ReportInput.parse(d))
   .handler(async ({ data }): Promise<Result<ReportAnalysisV2>> => {
     try {
@@ -83,7 +84,7 @@ export const analyzeReport = createServerFn({ method: "POST" })
           fileName: data.fileName,
         },
         pipeline,
-        brief: null,
+        brief: buildDoctorBrief(pipeline),
       };
 
       return okResult(envelope);

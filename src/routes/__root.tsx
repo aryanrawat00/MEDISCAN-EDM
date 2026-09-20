@@ -81,11 +81,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "MediScan AI — AI-powered medical assistant" },
+      { title: "MediScan AI — Evidence-First Clinical Intelligence" },
       {
         name: "description",
         content:
-          "MediScan AI is an educational AI assistant that helps you understand medical reports and symptoms. Not a substitute for professional care.",
+          "MediScan AI is an evidence-first clinical intelligence platform for medical reports and medicines. Educational only — not a substitute for professional medical care.",
       },
     ],
     links: [{ rel: "stylesheet", href: appCss }],
@@ -121,10 +121,11 @@ function RootComponent() {
             <main className="flex-1">
               <Outlet />
             </main>
-            <footer className="border-t border-border/60 py-6 text-center text-xs text-muted-foreground">
+            <footer className="border-t border-border/60 py-6 text-center text-xs text-muted-foreground print:hidden">
               <div className="flex flex-wrap items-center justify-center gap-4">
                 <Link to="/about" className="hover:text-foreground">About</Link>
                 <Link to="/contact" className="hover:text-foreground">Contact</Link>
+                <Link to="/demo" className="hover:text-foreground">Demo Lab</Link>
               </div>
               <p className="mt-2">© {new Date().getFullYear()} MediScan AI · Educational use only. Not medical advice.</p>
             </footer>

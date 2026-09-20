@@ -12,10 +12,11 @@ import { CheckCircle2, FileText, Quote } from "lucide-react";
 interface SourceViewerProps {
   sourceText: string;
   evidence: FindingEvidence | null;
+  fileName?: string;
   className?: string;
 }
 
-export function SourceViewer({ sourceText, evidence, className = "" }: SourceViewerProps) {
+export function SourceViewer({ sourceText, evidence, fileName, className = "" }: SourceViewerProps) {
   const highlightRef = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
@@ -27,10 +28,16 @@ export function SourceViewer({ sourceText, evidence, className = "" }: SourceVie
     }
   }, [evidence]);
 
-  if (!sourceText) {
+  if (!sourceText || sourceText.trim().length === 0) {
     return (
-      <div className={`p-8 text-center text-sm text-muted-foreground ${className}`}>
-        No source text provided.
+      <div className={`flex flex-col items-center justify-center rounded-xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground ${className}`}>
+        <FileText className="mb-2 h-8 w-8 text-muted-foreground/40" />
+        <p className="font-semibold text-foreground">Extracted source text is unavailable</p>
+        <p className="mt-1 text-xs text-muted-foreground">
+          {fileName
+            ? `Source file: ${fileName}. Raw document text was not retained in session memory.`
+            : "Original document text is not stored for this analysis view."}
+        </p>
       </div>
     );
   }

@@ -1,7 +1,7 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { AuthGate } from "@/components/AuthGate";
+import { useAuth } from "@/lib/auth-context";
 import { Disclaimer } from "@/components/Disclaimer";
 import { Button } from "@/components/ui/button";
 import { ReportInput } from "@/components/report/ReportInput";
@@ -12,6 +12,7 @@ import { PipelineTrace } from "@/components/report/PipelineTrace";
 import { DoctorBriefView } from "@/components/report/DoctorBrief";
 import { VerificationLab } from "@/components/report/VerificationLab";
 import { useReportPipeline } from "@/hooks/useReportPipeline";
+import { buildDoctorBrief } from "@/lib/report/brief";
 import { saveAnalysis } from "@/lib/analyses";
 import { toast } from "sonner";
 import {
@@ -23,20 +24,19 @@ import {
   FlaskConical,
   Activity,
   Layers,
+  Sparkles,
+  LogIn,
 } from "lucide-react";
 
 export const Route = createFileRoute("/analyzer")({
   head: () => ({ meta: [{ title: "Report Analyzer — MediScan AI" }] }),
-  component: () => (
-    <AuthGate>
-      <Analyzer />
-    </AuthGate>
-  ),
+  component: () => <Analyzer />,
 });
 
 type ActiveTab = "findings" | "brief" | "trace" | "lab";
 
 function Analyzer() {
+  const { user } = useAuth();
   const qc = useQueryClient();
   const [activeTab, setActiveTab] = useState<ActiveTab>("findings");
   const [reportTitle, setReportTitle] = useState<string>("");
@@ -66,19 +66,27 @@ function Analyzer() {
 
     const out = await runAnalysis(text, fileName, sourceKind);
     if (out) {
-      // Background save to Supabase history
-      saveAnalysis({
-        kind: "report",
-        title,
-        input: text,
-        result: out,
-      })
-        .then(() => {
-          qc.invalidateQueries({ queryKey: ["analyses"] });
+      if (user) {
+        // Signed-in user: persist to Supabase history
+        saveAnalysis({
+          kind: "report",
+          title,
+          input: text,
+          result: out,
         })
-        .catch((err) => {
-          console.warn("Failed to auto-save analysis to Supabase:", err);
-        });
+          .then(() => {
+            qc.invalidateQueries({ queryKey: ["analyses"] });
+            toast.success("Analysis saved to your private history.");
+          })
+          .catch((err) => {
+            console.warn("Failed to auto-save analysis to Supabase:", err);
+          });
+      } else {
+        // Guest mode: session memory only
+        toast.info(
+          "Analysis complete in Guest Mode. Sign in anytime to save your results to permanent history.",
+        );
+      }
     }
   };
 
@@ -93,8 +101,27 @@ function Analyzer() {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
+      {/* Guest Mode Banner */}
+      {!user && (
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border/80 bg-muted/40 px-4 py-3 text-xs text-foreground print:hidden">
+          <div className="flex items-center gap-2">
+            <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-0.5 font-semibold text-primary">
+              <Sparkles className="h-3 w-3" /> Guest Session
+            </span>
+            <span className="text-muted-foreground">
+              Live deterministic clinical analysis is active. Results are kept in browser memory.
+            </span>
+          </div>
+          <Button asChild size="sm" variant="outline" className="h-7 text-xs">
+            <Link to="/login">
+              <LogIn className="mr-1.5 h-3 w-3" /> Sign in to save history
+            </Link>
+          </Button>
+        </div>
+      )}
+
       {/* Header */}
-      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border pb-6">
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border pb-6 print:hidden">
         <div className="flex items-center gap-3">
           <div className="flex h-11 w-11 items-center justify-center rounded-xl brand-gradient text-white shadow-sm">
             <FileText className="h-6 w-6" />
@@ -116,7 +143,7 @@ function Analyzer() {
         )}
       </div>
 
-      <Disclaimer className="mt-4" />
+      <Disclaimer className="mt-4 print:hidden" />
 
       {/* Main View: Input vs Results */}
       {!analysis ? (
@@ -139,7 +166,7 @@ function Analyzer() {
       ) : (
         <div className="mt-6 space-y-6">
           {/* Summary Strip */}
-          <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-border bg-card p-4 shadow-sm">
+          <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-border bg-card p-4 shadow-sm print:hidden">
             <div>
               <div className="flex items-center gap-2">
                 <h2 className="font-semibold text-foreground">{reportTitle}</h2>
@@ -170,7 +197,7 @@ function Analyzer() {
           </div>
 
           {/* Navigation Tabs */}
-          <div className="flex flex-wrap items-center gap-2 border-b border-border pb-1">
+          <div className="flex flex-wrap items-center gap-2 border-b border-border pb-1 print:hidden">
             <TabButton
               active={activeTab === "findings"}
               onClick={() => setActiveTab("findings")}
@@ -199,7 +226,7 @@ function Analyzer() {
 
           {/* Tab 1: Findings & Evidence (Table + Split Inspector) */}
           {activeTab === "findings" && (
-            <div className="space-y-6">
+            <div className="space-y-6 print:hidden">
               <FindingsTable
                 findings={analysis.pipeline.findings}
                 selectedFindingId={selectedFindingId}
@@ -220,7 +247,8 @@ function Analyzer() {
                   </h3>
                   <div className="max-h-[500px] overflow-auto rounded-xl border border-border bg-card p-4 shadow-sm font-mono text-xs">
                     <SourceViewer
-                      sourceText={lastSourceText || analysis.source.fileName || ""}
+                      sourceText={lastSourceText}
+                      fileName={analysis.source.fileName}
                       evidence={selectedFinding?.evidence ?? null}
                     />
                   </div>
@@ -231,25 +259,23 @@ function Analyzer() {
 
           {/* Tab 2: Doctor Brief */}
           {activeTab === "brief" && (
-            analysis.brief ? (
-              <DoctorBriefView brief={analysis.brief} />
-            ) : (
-              <div className="rounded-xl border border-border p-8 text-center text-sm text-muted-foreground">
-                Doctor visit brief is not available for this report.
-              </div>
-            )
+            <DoctorBriefView
+              brief={analysis.brief ?? buildDoctorBrief(analysis.pipeline)}
+            />
           )}
 
           {/* Tab 3: Pipeline Telemetry */}
           {activeTab === "trace" && (
-            <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
+            <div className="rounded-xl border border-border bg-card p-5 shadow-sm print:hidden">
               <PipelineTrace pipeline={analysis.pipeline} />
             </div>
           )}
 
           {/* Tab 4: Tamper Lab */}
           {activeTab === "lab" && (
-            <VerificationLab />
+            <div className="print:hidden">
+              <VerificationLab />
+            </div>
           )}
         </div>
       )}
