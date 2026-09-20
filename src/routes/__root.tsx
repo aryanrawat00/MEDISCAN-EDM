@@ -80,13 +80,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   head: () => ({
     meta: [
       { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
+      { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
       { title: "MediScan AI — Evidence-First Clinical Intelligence" },
       {
         name: "description",
         content:
           "MediScan AI is an evidence-first clinical intelligence platform for medical reports and medicines. Educational only — not a substitute for professional medical care.",
       },
+      { name: "theme-color", content: "#2563eb" },
+      { name: "referrer", content: "strict-origin-when-cross-origin" },
+      { property: "og:type", content: "website" },
+      { property: "og:title", content: "MediScan AI — Evidence-First Clinical Intelligence" },
+      { property: "og:description", content: "Deterministic medical report analysis and medicine verification. Educational use only." },
     ],
     links: [{ rel: "stylesheet", href: appCss }],
   }),
@@ -118,7 +123,7 @@ function RootComponent() {
         <AuthProvider>
           <div className="flex min-h-screen flex-col bg-background text-foreground">
             <Navbar />
-            <main className="flex-1">
+            <main id="main-content" className="flex-1">
               <Outlet />
             </main>
             <footer className="border-t border-border/60 py-6 text-center text-xs text-muted-foreground print:hidden">

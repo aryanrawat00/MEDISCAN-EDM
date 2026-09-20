@@ -51,6 +51,7 @@ function DemoPage() {
   const [selectedFindingId, setSelectedFindingId] = useState<string | null>(null);
   const [selectedMedicineIndex, setSelectedMedicineIndex] = useState<number>(0);
   const [medicineSubTab, setMedicineSubTab] = useState<"ingredients" | "monograph" | "evidence">("ingredients");
+  const [showGuide, setShowGuide] = useState(true);
 
   const sample: ReportSample = REPORT_SAMPLES[selectedSampleIndex];
   const medicineSample: MedicineSample = MEDICINE_SAMPLES[selectedMedicineIndex];
@@ -72,6 +73,34 @@ function DemoPage() {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
+      {/* Onboarding Guide */}
+      {showGuide && (
+        <div className="mb-6 rounded-xl border border-amber-500/30 bg-amber-500/5 p-4 relative" role="region" aria-label="Demo guide">
+          <button
+            onClick={() => setShowGuide(false)}
+            className="absolute top-2 right-2 rounded-md p-1 text-muted-foreground hover:text-foreground"
+            aria-label="Dismiss guide"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+          </button>
+          <div className="flex items-start gap-3">
+            <Sparkles className="h-5 w-5 text-amber-500 shrink-0 mt-0.5" />
+            <div className="text-sm">
+              <p className="font-semibold text-foreground">Welcome to the Demo Lab!</p>
+              <p className="mt-1 text-muted-foreground leading-relaxed">
+                This demo runs <strong>entirely offline</strong> in your browser. Try these steps:
+              </p>
+              <ol className="mt-2 list-decimal list-inside space-y-1 text-muted-foreground text-xs">
+                <li>Switch between <strong>Report Intelligence</strong> and <strong>Medicine Lens</strong> using the toggle above</li>
+                <li>Select different sample cases to see how the deterministic engine analyzes each one</li>
+                <li>Explore the <strong>Findings</strong>, <strong>Doctor Brief</strong>, <strong>Audit Trail</strong>, and <strong>Verification Lab</strong> tabs</li>
+                <li>Click any finding row to see its detailed evidence, verbatim quotes, and rule trace</li>
+              </ol>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Banner */}
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border pb-6">
         <div>

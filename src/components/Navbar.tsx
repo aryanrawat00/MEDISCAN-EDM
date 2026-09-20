@@ -39,7 +39,15 @@ export function Navbar() {
   const closeMobile = () => setMobileMenuOpen(false);
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-border/60 bg-background/80 backdrop-blur print:hidden">
+    <>
+      {/* Skip to main content — accessibility */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-2 focus:z-50 focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground focus:outline-none"
+      >
+        Skip to main content
+      </a>
+      <header className="sticky top-0 z-40 w-full border-b border-border/60 bg-background/80 backdrop-blur shadow-sm print:hidden">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
         <Link to="/" onClick={closeMobile} className="flex items-center gap-2">
           <div className="flex h-9 w-9 items-center justify-center rounded-lg brand-gradient text-white">
@@ -209,6 +217,7 @@ export function Navbar() {
         </div>
       )}
     </header>
+    </>
   );
 }
 
