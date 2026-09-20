@@ -124,4 +124,40 @@ describe("Deterministic Drug Interaction Engine", () => {
     expect(res.disclaimer).toContain("MediScan Drug Interaction Checker");
     expect(res.disclaimer).toContain("does not provide medical advice");
   });
+
+  it("handles edge cases: brand aliases, mixed capitalization, and extra whitespace", () => {
+    // Tylenol resolves to paracetamol, Advil resolves to ibuprofen
+    const res = checkDrugInteractions(["  tYlEnOl  ", "   aDvIL\t "]);
+    expect(res.totalMedicines).toBe(2);
+    expect(res.totalPairs).toBe(1);
+    expect(res.pairs[0].status).toBe("known");
+    expect(res.pairs[0].severity).toBe("moderate");
+    expect(res.pairs[0].pairKey).toBe("ibuprofen|paracetamol");
+  });
+
+  it("handles duplicate brand and generic names across input list", () => {
+    // Tylenol, Paracetamol, and Dolo 650 all collapse to 1 medicine
+    // Advil and Ibuprofen collapse to 1 medicine
+    const res = checkDrugInteractions([
+      "Tylenol",
+      "Paracetamol",
+      "Dolo 650",
+      "Advil",
+      "Ibuprofen",
+      "IBUPROFEN",
+    ]);
+    expect(res.totalMedicines).toBe(2);
+    expect(res.totalPairs).toBe(1);
+  });
+
+  it("handles unsupported medicines gracefully without throwing or falsely claiming safety", () => {
+    const res = checkDrugInteractions(["Amoxicillin", "Metformin"]);
+    expect(res.totalMedicines).toBe(2);
+    expect(res.totalPairs).toBe(1);
+    expect(res.pairs[0].status).toBe("not_found");
+    expect(res.pairs[0].description).toBe(NOT_FOUND_EXPLANATION);
+    expect(res.pairs[0].safetyNote).toBe(NOT_FOUND_SAFETY_NOTE);
+    expect(res.pairs[0].description).not.toContain("safe");
+  });
 });
+

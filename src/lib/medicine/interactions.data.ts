@@ -37,8 +37,8 @@ export const VERIFIED_DRUG_INTERACTIONS: DrugInteractionRecord[] = [
     whyItMatters:
       "Taking ibuprofen concurrently can attenuate the cardioprotective benefits of daily aspirin and significantly increases the risk of serious stomach ulceration and bleeding.",
     evidence:
-      "FDA Drug Safety Communication: Concomitant use of ibuprofen and aspirin can attenuate the cardioprotective effect of aspirin. Furthermore, combined use of multiple NSAIDs produces additive risk of serious gastrointestinal adverse events including ulceration, bleeding, and perforation.",
-    source: "U.S. FDA Drug Labeling (SPL) via DailyMed — Ibuprofen & Aspirin Monograph",
+      "FDA Drug Safety Communication / SPL Section 7.1: Concomitant administration of ibuprofen and aspirin is not generally recommended because of the potential of increased adverse effects. Ibuprofen may interfere with the antiplatelet effect of low dose aspirin. Furthermore, combined use of multiple NSAIDs produces additive risk of serious gastrointestinal adverse events including ulceration, bleeding, and perforation.",
+    source: "U.S. FDA Drug Labeling (SPL) via DailyMed — Ibuprofen (SetID: 7c1cb5a4) & Aspirin (SetID: 41995e6f)",
   },
   {
     pairKey: "ibuprofen|paracetamol",
@@ -54,8 +54,8 @@ export const VERIFIED_DRUG_INTERACTIONS: DrugInteractionRecord[] = [
     whyItMatters:
       "Patients often unknowingly consume both active ingredients across multiple multi-symptom cold/flu formulations, increasing the risk of accidental acetaminophen overdose or NSAID-induced nephrotoxicity.",
     evidence:
-      "FDA OTC Pain Reliever & Fever Reducer Guidelines: When combining or alternating analgesics, strictly verify maximum daily dosages (acetaminophen ≤ 4,000 mg/24h, ibuprofen ≤ 1,200 mg/24h OTC) to prevent acute hepatic injury or renal impairment.",
-    source: "U.S. FDA OTC Analgesic Labeling / DailyMed",
+      "FDA OTC Drug Facts Labeling: Liver warning: Severe liver damage may occur if you take more than 4,000 mg of acetaminophen in 24 hours or with other drugs containing acetaminophen. Stomach bleeding warning: NSAIDs may cause severe stomach bleeding. When combining analgesics, strictly verify maximum daily dosages to prevent acute hepatic or renal impairment.",
+    source: "U.S. FDA OTC Drug Facts Labeling via DailyMed — Acetaminophen (SetID: 93f494a8) & Ibuprofen (SetID: 7c1cb5a4)",
   },
   {
     pairKey: "aspirin|paracetamol",
@@ -71,8 +71,8 @@ export const VERIFIED_DRUG_INTERACTIONS: DrugInteractionRecord[] = [
     whyItMatters:
       "Exceeding safe cumulative analgesic intake can exacerbate gastric irritation and increase the burden on renal filtration.",
     evidence:
-      "FDA Drug Labeling: Patients taking daily aspirin for cardioprotection or analgesia should consult a healthcare provider before using concurrent analgesic preparations to avoid cumulative toxicity.",
-    source: "U.S. FDA Drug Labeling (SPL) — Acetaminophen & Aspirin",
+      "FDA Drug Facts Labeling (21 CFR 343.50): Ask a doctor or pharmacist before use if you are taking other medications containing a pain reliever or fever reducer. Patients taking daily aspirin for cardioprotection or analgesia should consult a healthcare provider before using concurrent analgesic preparations to avoid cumulative toxicity.",
+    source: "U.S. FDA Drug Labeling (SPL) via DailyMed — Acetaminophen (SetID: 93f494a8) & Aspirin (SetID: 41995e6f)",
   },
   {
     pairKey: "chlorpheniramine|diphenhydramine",
@@ -88,8 +88,8 @@ export const VERIFIED_DRUG_INTERACTIONS: DrugInteractionRecord[] = [
     whyItMatters:
       "Concurrent use dramatically amplifies anticholinergic toxicity, causing severe sedation, marked dry mouth, urinary retention, blurred vision, dizziness, and central nervous system depression.",
     evidence:
-      "FDA Drug Labeling: Do not use with any other product containing diphenhydramine or other first-generation antihistamines (prescription or OTC). Concurrent use increases anticholinergic toxicity and profound CNS depression.",
-    source: "U.S. FDA Drug Labeling (SPL) — Antihistamine Class Warning",
+      "FDA Drug Facts / SPL Section 4: Do not use with any other product containing diphenhydramine or other first-generation antihistamines (prescription or OTC). Marked drowsiness may occur. Concurrent use increases anticholinergic toxicity and profound central nervous system depression.",
+    source: "U.S. FDA Drug Labeling (SPL) via DailyMed — Diphenhydramine (SetID: 1e14ba57) & Chlorpheniramine (SetID: 57e84992)",
   },
   {
     pairKey: "cetirizine|diphenhydramine",
@@ -105,8 +105,8 @@ export const VERIFIED_DRUG_INTERACTIONS: DrugInteractionRecord[] = [
     whyItMatters:
       "Combining these active ingredients increases the risk of marked drowsiness, lethargy, and impaired psychomotor skills necessary for driving or operating machinery.",
     evidence:
-      "FDA Labeling: Concurrent use of multiple antihistamines should generally be avoided; additive sedative effects and CNS depression may occur, impairing alertness and motor skills.",
-    source: "U.S. FDA Drug Labeling (SPL) — Cetirizine / Diphenhydramine Warnings",
+      "FDA Drug Facts / SPL Warnings: Concurrent use of multiple antihistamines should generally be avoided; additive sedative effects and CNS depression may occur, impairing alertness and motor skills. Alcohol, sedatives, and tranquilizers may increase drowsiness.",
+    source: "U.S. FDA Drug Labeling (SPL) via DailyMed — Cetirizine (SetID: 392b2361) & Diphenhydramine (SetID: 1e14ba57)",
   },
   {
     pairKey: "cetirizine|chlorpheniramine",
@@ -122,8 +122,8 @@ export const VERIFIED_DRUG_INTERACTIONS: DrugInteractionRecord[] = [
     whyItMatters:
       "Redundant receptor saturation increases adverse sedative and anticholinergic effects without providing additional therapeutic anti-allergy benefit.",
     evidence:
-      "FDA Labeling: Avoid concurrent administration of multiple systemic H1-receptor antagonists unless specifically directed by a healthcare provider.",
-    source: "U.S. FDA OTC Antihistamine Class Labeling",
+      "FDA OTC Antihistamine Class Labeling: Avoid concurrent administration of multiple systemic H1-receptor antagonists unless specifically directed by a healthcare provider. Redundant receptor saturation increases adverse sedative and anticholinergic side effects.",
+    source: "U.S. FDA OTC Drug Facts Labeling via DailyMed — Cetirizine (SetID: 392b2361) & Chlorpheniramine (SetID: 57e84992)",
   },
   {
     pairKey: "dextromethorphan|phenylephrine",
@@ -139,8 +139,8 @@ export const VERIFIED_DRUG_INTERACTIONS: DrugInteractionRecord[] = [
     whyItMatters:
       "Patients with underlying hypertension, thyroid disease, or arrhythmias must exercise caution, as sympathomimetic stimulation may elevate blood pressure and heart rate.",
     evidence:
-      "FDA Drug Labeling: Phenylephrine may cause vasoconstriction and elevate blood pressure. Patients with cardiovascular disease or taking serotonergic or adrenergic agents should exercise caution.",
-    source: "U.S. FDA OTC Cold & Cough Monograph",
+      "FDA OTC Monograph (21 CFR 341) / Drug Facts: Ask a doctor before use if you have heart disease, high blood pressure, thyroid disease, or diabetes. Phenylephrine may cause vasoconstriction and elevate blood pressure when combined with adrenergic or serotonergic agents.",
+    source: "U.S. FDA OTC Cold & Cough Monograph via DailyMed — Dextromethorphan (SetID: 651bce70) & Phenylephrine (SetID: 89afc811)",
   },
   {
     pairKey: "aspirin|omeprazole",
@@ -156,7 +156,7 @@ export const VERIFIED_DRUG_INTERACTIONS: DrugInteractionRecord[] = [
     whyItMatters:
       "While PPIs are frequently co-prescribed with NSAIDs for gastroprotection, premature dissolution of enteric-coated tablets may lead to localized gastric irritation or altered absorption kinetics.",
     evidence:
-      "FDA Drug Labeling: Omeprazole produces profound gastric acid suppression. Alterations in gastric pH may alter the dissolution rate of pH-dependent enteric-coated formulations.",
-    source: "U.S. FDA Drug Labeling (SPL) — Omeprazole Monograph",
+      "FDA Drug Labeling (SPL Section 7) — Omeprazole: Because of its profound and long-lasting inhibition of gastric acid secretion, omeprazole can alter the absorption and dissolution of drugs where gastric pH is an important determinant of bioavailability, including pH-dependent enteric-coated formulations.",
+    source: "U.S. FDA Drug Labeling (SPL) via DailyMed — Omeprazole (SetID: 29e96df0) & Aspirin (SetID: 41995e6f)",
   },
 ];
