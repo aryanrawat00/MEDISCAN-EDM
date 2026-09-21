@@ -9,18 +9,42 @@ import { T } from "@/lib/i18n";
 import React from "react";
 import { MedicineReferenceEntry } from "@/lib/medicine/reference.data";
 import { ShieldCheck, AlertOctagon, AlertTriangle, ExternalLink, CheckCircle2, Bookmark } from "lucide-react";
+import { PresentationModeToggle } from "@/components/PresentationModeToggle";
+import { usePresentationMode, type PresentationMode } from "@/lib/presentation-mode";
+import { getWarningCopy } from "@/lib/medicine/warning-copy";
+
+export function MedicineReferenceSubtitle() {
+  const { mode } = usePresentationMode();
+  return <T>{mode === "plain" ? "What we found for this medicine." : "Reference snapshot from the existing openFDA label registry."}</T>;
+}
+
+export function MedicineWarning({ medicine, original, mode }: { medicine: MedicineReferenceEntry; original: string; mode: PresentationMode }) {
+  const copy = getWarningCopy(medicine, original);
+  const showOriginal = mode === "technical" || !copy || copy.keepOriginalVisible;
+  return <div className="space-y-1 leading-relaxed">
+    {copy && <p className="font-semibold">{copy.lead}</p>}
+    {showOriginal ? <div><span className="text-[10px] font-medium opacity-75"><T>Official FDA wording</T></span><p>{original}</p></div> :
+      <details key={mode} className="text-xs">
+        <summary className="w-fit cursor-pointer rounded py-1 font-medium opacity-80 hover:opacity-100"><T>Official FDA wording</T></summary>
+        <p className="pt-1">{original}</p>
+      </details>}
+  </div>;
+}
 
 interface MonographViewProps {
   monographs: MedicineReferenceEntry[];
   onAddToChecker?: (monograph: MedicineReferenceEntry) => void;
   className?: string;
+  showSubtitle?: boolean;
 }
 
 export function MonographView({
   monographs,
   onAddToChecker,
   className = "",
+  showSubtitle = true,
 }: MonographViewProps) {
+  const { mode } = usePresentationMode();
   if (!monographs || monographs.length === 0) {
     return (
       <div className={`rounded-xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground ${className}`}>
@@ -30,6 +54,10 @@ export function MonographView({
 
   return (
     <div className={`space-y-6 ${className}`}>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        {showSubtitle && <p className="text-xs text-muted-foreground"><MedicineReferenceSubtitle /></p>}
+        <PresentationModeToggle />
+      </div>
       {monographs.map((mono) => (
         <div key={mono.key} className="rounded-xl border border-border bg-card p-5 shadow-sm space-y-4">
           {/* Header */}
@@ -59,9 +87,9 @@ export function MonographView({
                   <span> <T>{"Add to Interaction Check"}</T> </span>
                 </button>
               )}
-              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-xs font-medium text-emerald-600 dark:text-emerald-400">
-                <ShieldCheck className="h-3.5 w-3.5" />  <T>{"Reviewed by"}</T> {mono.review.by}
-              </span>
+              {mono.review.status === "APPROVED" && <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-xs font-medium text-emerald-600 dark:text-emerald-400">
+                <ShieldCheck className="h-3.5 w-3.5 shrink-0" /> <T>Checked against the official FDA label.</T>
+              </span>}
             </div>
           </div>
 
@@ -74,7 +102,7 @@ export function MonographView({
               </div>
               <ul className="list-disc pl-5 text-destructive space-y-1">
                 {mono.boxedWarnings.map((w, i) => (
-                  <li key={i}>{w}</li>
+                  <li key={i}><MedicineWarning medicine={mono} original={w} mode={mode} /></li>
                 ))}
               </ul>
             </div>
@@ -97,14 +125,20 @@ export function MonographView({
               <AlertTriangle className="h-3.5 w-3.5 text-amber-500" />  <T>{"Important Safety Warnings & Precautions"}</T> </h4>
             <ul className="list-disc pl-5 text-xs text-muted-foreground space-y-1.5">
               {mono.importantSafety.map((warn, i) => (
-                <li key={i} className="text-foreground/90">{warn}</li>
+                <li key={i} className="text-foreground/90"><MedicineWarning medicine={mono} original={warn} mode={mode} /></li>
               ))}
             </ul>
           </div>
 
           {/* SPL Provenance Footer */}
-          <div className="flex flex-wrap items-center justify-between gap-2 border-t border-border pt-3 text-[11px] text-muted-foreground font-mono">
-            <span> <T>{"Source:"}</T> {mono.source.name}  <T>{"(Set ID:"}</T> {mono.source.setId.slice(0, 8)}…)</span>
+          <div className="flex flex-wrap items-center justify-between gap-2 border-t border-border pt-3 text-[11px] text-muted-foreground">
+            {mode === "plain" ? <div className="min-w-0 space-y-1">
+              <p><T>Source: official U.S. FDA drug label, via openFDA</T></p>
+              <details>
+                <summary className="w-fit cursor-pointer rounded py-1 font-medium text-foreground hover:underline"><T>Details</T></summary>
+                <p className="break-words font-mono"><T>Source:</T> {mono.source.name} (<T>Set ID:</T> {mono.source.setId})</p>
+              </details>
+            </div> : <p className="min-w-0 break-words font-mono"><T>Source:</T> {mono.source.name} (<T>Set ID:</T> {mono.source.setId})</p>}
             <a
               href={mono.source.url}
               target="_blank"

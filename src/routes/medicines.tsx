@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { MedicineIdentityCard } from "@/components/medicine/MedicineIdentityCard";
 import { IngredientsTable } from "@/components/medicine/IngredientsTable";
-import { MonographView } from "@/components/medicine/MonographView";
+import { MonographView, MedicineReferenceSubtitle } from "@/components/medicine/MonographView";
 import { PackagingEvidenceViewer } from "@/components/medicine/PackagingEvidenceViewer";
 import { useMedicineScan } from "@/hooks/useMedicineScan";
 import { MEDICINE_SAMPLES, MedicineSample } from "@/lib/medicine/samples";
@@ -322,7 +322,7 @@ function MedicineLens() {
                        <T>{"Reference information:"}</T> {selectedMonograph.displayName}
                     </h3>
                     <p className="text-xs text-muted-foreground">
-                       <T>{"Reference snapshot from the existing openFDA label registry."}</T> </p>
+                       <MedicineReferenceSubtitle /> </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
@@ -345,6 +345,7 @@ function MedicineLens() {
 
               <MonographView
                 monographs={[selectedMonograph]}
+                showSubtitle={false}
                 onAddToChecker={(mono) => handleAddToChecker(mono.displayName)}
               />
             </div>

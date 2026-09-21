@@ -7,13 +7,27 @@
 
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 
+const OBSOLETE_MODELS = new Set([
+  "gemini-1.5-flash",
+  "gemini-1.5-flash-latest",
+  "gemini-1.5-pro",
+  "gemini-1.5-pro-latest",
+  "gemini-2.0-flash",
+  "gemini-2.0-flash-exp",
+]);
+
 const DEFAULT_CANDIDATES = [
   "gemini-2.5-flash",
-  "gemini-2.0-flash",
-  "gemini-1.5-flash",
+  "gemini-3.6-flash",
+  "gemini-3.5-flash",
+  "gemini-flash-latest",
 ];
 
 let activeWorkingModel: string | null = null;
+
+export function resetActiveWorkingModel(): void {
+  activeWorkingModel = null;
+}
 
 export function getModelCandidates(): string[] {
   const envModels = process.env.GEMINI_MODEL;
@@ -23,8 +37,20 @@ export function getModelCandidates(): string[] {
   const parsed = envModels
     .split(",")
     .map((s) => s.trim())
-    .filter(Boolean);
-  return parsed.length > 0 ? parsed : DEFAULT_CANDIDATES;
+    .filter((m) => m && !OBSOLETE_MODELS.has(m));
+
+  if (parsed.length === 0) {
+    return DEFAULT_CANDIDATES;
+  }
+
+  // Ensure supported fallbacks are available if the user-specified candidate fails
+  const candidateSet = new Set(parsed);
+  for (const fallback of DEFAULT_CANDIDATES) {
+    if (!candidateSet.has(fallback)) {
+      parsed.push(fallback);
+    }
+  }
+  return parsed;
 }
 
 export function getGoogleAIClient() {

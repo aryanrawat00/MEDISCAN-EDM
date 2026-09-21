@@ -131,7 +131,7 @@ Key configuration keys:
 VITE_SUPABASE_URL=your_supabase_project_url
 VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 GEMINI_API_KEY=your_gemini_api_key
-GEMINI_MODEL=gemini-2.5-flash,gemini-2.0-flash,gemini-1.5-flash
+GEMINI_MODEL=gemini-2.5-flash,gemini-3.6-flash,gemini-3.5-flash
 ```
 
 ### 3. Development Commands

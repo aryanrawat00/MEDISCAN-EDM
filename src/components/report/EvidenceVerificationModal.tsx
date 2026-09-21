@@ -13,6 +13,10 @@ import { deriveRuleAppliedText } from "@/lib/report/verificationId";
 import { explainFindingStatus } from "@/lib/report/explain";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/StatusBadge";
+import { RangeBar } from "./RangeBar";
+import { PresentationModeToggle } from "@/components/PresentationModeToggle";
+import { usePresentationMode } from "@/lib/presentation-mode";
+import { plainReportExplanation, reportAudit, REPORT_PLAIN_COPY } from "@/lib/report/plain-copy";
 import {
   ShieldCheck,
   ShieldAlert,
@@ -23,7 +27,6 @@ import {
   AlertCircle,
   Quote,
   Terminal,
-  ExternalLink,
 } from "lucide-react";
 
 interface EvidenceVerificationModalProps {
@@ -42,6 +45,8 @@ export function EvidenceVerificationModal({
   onClose,
 }: EvidenceVerificationModalProps) {
   const { t } = useI18n();
+  const { mode } = usePresentationMode();
+  const isPlain = mode === "plain";
   if (!isOpen || !finding) return null;
 
   const { evidence } = finding;
@@ -59,6 +64,7 @@ export function EvidenceVerificationModal({
     referenceRangeText: finding.referenceRangeText,
   });
   const findingExplanation = explainFindingStatus(finding);
+  const audit = reportAudit(finding, sourceTextAvailable);
 
   // Determine Verification State: VERIFIED | UNVERIFIED | SOURCE UNAVAILABLE
   let verificationState: "VERIFIED" | "UNVERIFIED" | "SOURCE_UNAVAILABLE" = "VERIFIED";
@@ -81,7 +87,7 @@ export function EvidenceVerificationModal({
         </button>
 
         {/* Modal Header */}
-        <div className="flex items-center gap-3 border-b border-border pb-4">
+        <div className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-3 border-b border-border pb-4 pr-6">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary shrink-0">
             <ShieldCheck className="h-5 w-5" />
           </div>
@@ -89,9 +95,10 @@ export function EvidenceVerificationModal({
             <DialogPrimitive.Title id="evidence-verification-title" className="text-lg font-bold tracking-tight text-foreground">
                <T>{"Evidence Verification"}</T> </DialogPrimitive.Title>
             <p className="text-xs text-muted-foreground">
-               <T>{"Deterministic verification audit for"}</T> <strong>{finding.testName}</strong>
+              {isPlain ? <><strong>{finding.testName}</strong> <T>— checked against your report.</T></> : <><T>Deterministic verification audit for</T> <strong>{finding.testName}</strong></>}
             </p>
           </div>
+          <div className="col-span-2"><PresentationModeToggle /></div>
         </div>
 
         {/* Verification State Badge */}
@@ -99,7 +106,7 @@ export function EvidenceVerificationModal({
           {verificationState === "VERIFIED" && (
             <div className="flex items-center gap-2 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-3.5 py-2 text-xs font-semibold text-emerald-700 dark:text-emerald-300">
               <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600" />
-              <span> <T>{"✓ Evidence verified against verbatim report source"}</T> </span>
+              <span><T>{isPlain ? "We found this exact result in your report." : "✓ Evidence verified against verbatim report source"}</T></span>
             </div>
           )}
           {verificationState === "UNVERIFIED" && (
@@ -151,13 +158,14 @@ export function EvidenceVerificationModal({
           </div>
 
           {/* Rule Applied */}
-          <div className="rounded-xl border border-primary/20 bg-primary/5 p-3.5 space-y-1">
-            <div className="flex items-center gap-1.5 font-semibold text-primary text-[11px] uppercase tracking-wider">
+          <div className="rounded-xl border border-primary/20 bg-primary/5 p-3.5 space-y-3">
+            {!isPlain && <div className="flex items-center gap-1.5 font-semibold text-primary text-[11px] uppercase tracking-wider">
               <Terminal className="h-3.5 w-3.5" />
               <span> <T>{"Rule Applied"}</T> </span>
-            </div>
-            <p className="font-mono text-xs text-foreground font-medium">
-              {ruleText}
+            </div>}
+            <RangeBar value={finding.value} range={finding.range} status={finding.status} unit={finding.unit} />
+            <p className={`${isPlain ? "leading-relaxed" : "font-mono"} text-xs text-foreground font-medium`}>
+              {isPlain ? plainReportExplanation(finding) : ruleText}
             </p>
           </div>
 
@@ -166,7 +174,7 @@ export function EvidenceVerificationModal({
             <div className="flex items-center justify-between text-[11px]">
               <span className="font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1">
                 <Quote className="h-3 w-3 text-primary" />
-                 <T>{"Original Evidence Quote"}</T> </span>
+                 <T>{isPlain ? "The exact words from your report" : "Original Evidence Quote"}</T> </span>
               <span className="text-muted-foreground">
                 {evidence.page ? `Page ${evidence.page}` : "Extracted Span"}
               </span>
@@ -197,37 +205,21 @@ export function EvidenceVerificationModal({
 
           {/* Verification Checklist */}
           <div className="rounded-xl border border-border/70 bg-card p-4 space-y-2">
-            <span className="font-semibold uppercase text-[10px] tracking-wider text-muted-foreground">
-               <T>{"Deterministic Verification Audit"}</T> </span>
-            <ul className="space-y-2 text-xs pt-1">
-              <li className="flex items-center gap-2">
-                <CheckCircle2
-                  className={`h-4 w-4 ${
-                    evidence.checks.quoteFound
-                      ? "text-emerald-600 dark:text-emerald-400"
-                      : "text-rose-500"
-                  }`}
-                />
-                <span className={evidence.checks.quoteFound ? "text-foreground font-medium" : "text-muted-foreground"}>
-                   <T>{"Evidence found in original document text"}</T> </span>
-              </li>
-              <li className="flex items-center gap-2">
-                <CheckCircle2
-                  className={`h-4 w-4 ${
-                    evidence.checks.valueInQuote
-                      ? "text-emerald-600 dark:text-emerald-400"
-                      : "text-rose-500"
-                  }`}
-                />
-                <span className={evidence.checks.valueInQuote ? "text-foreground font-medium" : "text-muted-foreground"}>
-                   <T>{"Value matches extracted data outside range boundaries"}</T> </span>
-              </li>
-              <li className="flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-                <span className="text-foreground font-medium">
-                   <T>{"Deterministic classification rule applied"}</T> </span>
-              </li>
-            </ul>
+            {isPlain ? <p className="text-xs leading-relaxed text-muted-foreground">{audit.trustText}</p> : <>
+              <span className="font-semibold uppercase text-[10px] tracking-wider text-muted-foreground"><T>Deterministic Verification Audit</T></span>
+              <ul className="space-y-2 text-xs pt-1">
+                {[
+                  { passed: audit.quoteFound, text: audit.quoteFound ? "Evidence found in original document text" : "Evidence could not be confirmed in the available source text." },
+                  { passed: audit.valueAndRangeFound, text: audit.valueAndRangeFound ? "The exact value and reference range printed above were both found in your report's text." : "The value and reference range could not both be confirmed in the available source text." },
+                  { passed: true, text: REPORT_PLAIN_COPY.fixedRule },
+                ].map(({ passed, text }) => (
+                  <li key={text} className="flex items-start gap-2">
+                    {passed ? <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600 dark:text-emerald-400" /> : <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />}
+                    <span className={passed ? "text-foreground font-medium" : "text-muted-foreground"}>{t(text)}</span>
+                  </li>
+                ))}
+              </ul>
+            </>}
           </div>
         </div>
 
