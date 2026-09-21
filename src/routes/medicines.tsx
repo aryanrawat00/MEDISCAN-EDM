@@ -21,6 +21,7 @@ import { MEDICINE_SAMPLES, MedicineSample } from "@/lib/medicine/samples";
 import { searchReferenceMonographs } from "@/lib/medicine/reference";
 import { MedicineReferenceEntry } from "@/lib/medicine/reference.data";
 import { saveAnalysis } from "@/lib/analyses";
+import { DrugInteractionChecker } from "@/components/medicine/DrugInteractionChecker";
 import {
   Pill,
   Camera,
@@ -35,6 +36,7 @@ import {
   Loader2,
   LogIn,
   X,
+  ArrowRightLeft,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -43,7 +45,7 @@ export const Route = createFileRoute("/medicines")({
   component: () => <MedicineLens />,
 });
 
-type MedicineTab = "ingredients" | "monograph" | "evidence";
+type MedicineTab = "ingredients" | "monograph" | "evidence" | "interactions";
 
 function MedicineLens() {
   const { user } = useAuth();
@@ -52,6 +54,8 @@ function MedicineLens() {
   const [activeTab, setActiveTab] = useState<MedicineTab>("ingredients");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedMonograph, setSelectedMonograph] = useState<MedicineReferenceEntry | null>(null);
+  const [interactionMeds, setInteractionMeds] = useState<string[]>([]);
+  const [interactionCount, setInteractionCount] = useState<number>(0);
 
   const {
     status,
@@ -112,6 +116,29 @@ function MedicineLens() {
     setSelectedMonograph(null);
     setActiveTab("ingredients");
     setSearchQuery("");
+  };
+
+  const handleAddToChecker = (medName: string) => {
+    const trimmed = medName.trim();
+    if (!trimmed) return;
+    setInteractionMeds((prev) => {
+      const lower = trimmed.toLowerCase();
+      if (prev.some((m) => m.toLowerCase() === lower)) {
+        toast.info(`"${trimmed}" is already in your interaction list.`);
+        return prev;
+      }
+      toast.success(`Added "${trimmed}" to Interaction Check.`);
+      return [...prev, trimmed];
+    });
+
+    if (scan) {
+      setActiveTab("interactions");
+    } else {
+      setTimeout(() => {
+        const el = document.getElementById("drug-interaction-checker");
+        el?.scrollIntoView({ behavior: "smooth" });
+      }, 50);
+    }
   };
 
   // Monograph quick search results
@@ -247,19 +274,33 @@ function MedicineLens() {
                   {searchResults.map((m) => (
                     <div
                       key={m.key}
-                      onClick={() => {
-                        setSelectedMonograph(m);
-                        toast.success(`Loaded FDA monograph: ${m.displayName}`);
-                      }}
-                      className="p-3 hover:bg-muted/40 cursor-pointer transition-colors text-xs"
+                      className="flex items-center justify-between p-3 hover:bg-muted/40 transition-colors text-xs"
                     >
-                      <div className="flex items-center justify-between">
-                        <span className="font-semibold text-foreground">{m.displayName}</span>
-                        <span className="rounded bg-primary/10 px-1.5 py-0.5 text-[10px] text-primary">
-                          {m.category}
-                        </span>
+                      <div
+                        onClick={() => {
+                          setSelectedMonograph(m);
+                          toast.success(`Loaded FDA monograph: ${m.displayName}`);
+                        }}
+                        className="flex-1 cursor-pointer pr-2"
+                      >
+                        <div className="flex items-center gap-2">
+                          <span className="font-semibold text-foreground">{m.displayName}</span>
+                          <span className="rounded bg-primary/10 px-1.5 py-0.5 text-[10px] text-primary">
+                            {m.category}
+                          </span>
+                        </div>
+                        <p className="text-muted-foreground mt-0.5 line-clamp-1">{m.purposeText}</p>
                       </div>
-                      <p className="text-muted-foreground mt-0.5 line-clamp-1">{m.purposeText}</p>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleAddToChecker(m.displayName)}
+                        className="h-7 px-2 text-[11px] text-primary border-primary/30 hover:bg-primary/5 shrink-0"
+                        title="Add to interaction check"
+                      >
+                        <ArrowRightLeft className="h-3 w-3 mr-1" /> + Check
+                      </Button>
                     </div>
                   ))}
                 </div>
@@ -276,7 +317,7 @@ function MedicineLens() {
           {/* Active Monograph Inspector (from direct reference browsing) */}
           {selectedMonograph && (
             <div className="rounded-2xl border border-primary/30 bg-card p-6 shadow-sm space-y-4">
-              <div className="flex items-center justify-between border-b border-border pb-3">
+              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border pb-3">
                 <div className="flex items-center gap-2">
                   <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
                     <Bookmark className="h-4 w-4" />
@@ -290,17 +331,30 @@ function MedicineLens() {
                     </p>
                   </div>
                 </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setSelectedMonograph(null)}
-                  className="h-8 px-2 text-xs"
-                >
-                  <X className="mr-1 h-3.5 w-3.5" /> Close View
-                </Button>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleAddToChecker(selectedMonograph.displayName)}
+                    className="h-8 px-2.5 text-xs border-primary/40 text-primary hover:bg-primary/5"
+                  >
+                    <ArrowRightLeft className="mr-1.5 h-3.5 w-3.5" /> Add to Interaction Check
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setSelectedMonograph(null)}
+                    className="h-8 px-2 text-xs"
+                  >
+                    <X className="mr-1 h-3.5 w-3.5" /> Close View
+                  </Button>
+                </div>
               </div>
 
-              <MonographView monographs={[selectedMonograph]} />
+              <MonographView
+                monographs={[selectedMonograph]}
+                onAddToChecker={(mono) => handleAddToChecker(mono.displayName)}
+              />
             </div>
           )}
 
@@ -339,11 +393,24 @@ function MedicineLens() {
               ))}
             </div>
           </div>
+
+          {/* Integrated Drug Interaction Checker (Deterministic, Ground-Truth Monograph Lookup) */}
+          <DrugInteractionChecker
+            initialMedicines={interactionMeds}
+            onMedicinesCountChange={setInteractionCount}
+          />
         </div>
       ) : (
         /* Results View */
         <div className="mt-6 space-y-6">
-          <MedicineIdentityCard scan={scan} />
+          <MedicineIdentityCard
+            scan={scan}
+            onAddToChecker={() =>
+              handleAddToChecker(
+                scan.brandName || scan.verifiedIngredients[0]?.name || "Scanned Medicine",
+              )
+            }
+          />
 
           {/* Sub Tabs */}
           <div className="flex flex-wrap items-center gap-2 border-b border-border pb-1">
@@ -380,6 +447,18 @@ function MedicineLens() {
             >
               <FileText className="h-3.5 w-3.5" /> Packaging OCR Evidence
             </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab("interactions")}
+              className={`inline-flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-xs font-medium transition-all ${
+                activeTab === "interactions"
+                  ? "bg-primary text-primary-foreground shadow-sm"
+                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
+              }`}
+            >
+              <ArrowRightLeft className="h-3.5 w-3.5" /> Drug Interaction Check
+              {interactionCount > 0 ? ` (${interactionCount})` : ""}
+            </button>
           </div>
 
           {/* Tab 1: Ingredients */}
@@ -405,7 +484,10 @@ function MedicineLens() {
 
           {/* Tab 2: Monograph */}
           {activeTab === "monograph" && (
-            <MonographView monographs={scan.monographs} />
+            <MonographView
+              monographs={scan.monographs}
+              onAddToChecker={(mono) => handleAddToChecker(mono.displayName)}
+            />
           )}
 
           {/* Tab 3: Packaging OCR Evidence */}
@@ -414,6 +496,14 @@ function MedicineLens() {
               transcribedText={scan.transcribedText}
               evidenceItems={scan.packagingEvidence}
               imagePreview={imagePreview}
+            />
+          )}
+
+          {/* Tab 4: Drug Interaction Check */}
+          {activeTab === "interactions" && (
+            <DrugInteractionChecker
+              initialMedicines={interactionMeds}
+              onMedicinesCountChange={setInteractionCount}
             />
           )}
         </div>

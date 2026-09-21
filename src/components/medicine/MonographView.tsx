@@ -11,10 +11,15 @@ import { ShieldCheck, AlertOctagon, AlertTriangle, ExternalLink, CheckCircle2, B
 
 interface MonographViewProps {
   monographs: MedicineReferenceEntry[];
+  onAddToChecker?: (monograph: MedicineReferenceEntry) => void;
   className?: string;
 }
 
-export function MonographView({ monographs, className = "" }: MonographViewProps) {
+export function MonographView({
+  monographs,
+  onAddToChecker,
+  className = "",
+}: MonographViewProps) {
   if (!monographs || monographs.length === 0) {
     return (
       <div className={`rounded-xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground ${className}`}>
@@ -43,7 +48,17 @@ export function MonographView({ monographs, className = "" }: MonographViewProps
               </p>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
+              {onAddToChecker && (
+                <button
+                  type="button"
+                  onClick={() => onAddToChecker(mono)}
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-primary/40 bg-primary/5 px-2.5 py-1 text-xs font-semibold text-primary hover:bg-primary/10 transition-colors"
+                >
+                  <Bookmark className="h-3.5 w-3.5" />
+                  <span>Add to Interaction Check</span>
+                </button>
+              )}
               <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-xs font-medium text-emerald-600 dark:text-emerald-400">
                 <ShieldCheck className="h-3.5 w-3.5" /> Reviewed by {mono.review.by}
               </span>

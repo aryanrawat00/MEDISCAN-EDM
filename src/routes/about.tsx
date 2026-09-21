@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { FileText, Pill, ShieldCheck, Sparkles, CheckCircle2, FileCheck } from "lucide-react";
+import { FileText, Pill, ShieldCheck, Sparkles, CheckCircle2, FileCheck, HelpCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/about")({
@@ -78,6 +78,72 @@ function About() {
               Guest analyses remain ephemeral in client session memory. Signed-in records are protected by database Row-Level Security.
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* How It Works */}
+      <section className="mt-12 space-y-6">
+        <h2 className="text-xl font-semibold">How It Works</h2>
+        <div className="grid gap-4 sm:grid-cols-3">
+          {[
+            {
+              step: "1",
+              title: "Upload or Photograph",
+              desc: "Upload a PDF lab report or take a photo of medicine packaging. MediScan extracts the raw text using secure OCR.",
+            },
+            {
+              step: "2",
+              title: "Evidence-Locked Analysis",
+              desc: "Deterministic code compares every extracted value against the lab's own printed reference range. No guessing, no AI opinion.",
+            },
+            {
+              step: "3",
+              title: "Review & Prepare",
+              desc: "Receive a verified, structured summary with suggested questions you can bring to your next doctor visit.",
+            },
+          ].map((s) => (
+            <div key={s.step} className="relative rounded-xl border border-border bg-card p-5">
+              <div className="absolute -top-3 left-4 flex h-6 w-6 items-center justify-center rounded-full brand-gradient text-xs font-bold text-white">
+                {s.step}
+              </div>
+              <h3 className="mt-2 font-semibold">{s.title}</h3>
+              <p className="mt-2 text-xs text-muted-foreground leading-relaxed">{s.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Why MediScan? FAQ */}
+      <section className="mt-12 rounded-2xl border border-border bg-card p-6 space-y-4">
+        <h2 className="flex items-center gap-2 text-xl font-semibold">
+          <HelpCircle className="h-5 w-5 text-primary" /> Why MediScan?
+        </h2>
+        <div className="space-y-3 text-sm">
+          {[
+            {
+              q: "Why can't I just read my lab report myself?",
+              a: "You absolutely can. MediScan doesn't replace reading — it structures and cross-references your results against the laboratory's own reference ranges, catches values you might overlook, and generates precise questions for your doctor.",
+            },
+            {
+              q: "Is MediScan a replacement for a doctor?",
+              a: "No. MediScan is an educational preparation tool only. It never diagnoses, prescribes, or provides treatment recommendations. Always consult a qualified healthcare professional.",
+            },
+            {
+              q: "How is this different from ChatGPT-style medical advice?",
+              a: "MediScan uses deterministic code rules — not AI opinions — to evaluate lab values. Every finding is anchored to a verbatim quote from your source document, so nothing is fabricated or hallucinated.",
+            },
+            {
+              q: "Is my data private?",
+              a: "Guest mode analyses stay in browser memory and are never stored. Signed-in analyses are protected by Supabase Row-Level Security — only you can see your data.",
+            },
+          ].map((faq, i) => (
+            <details key={i} className="group rounded-lg border border-border/60 bg-muted/20">
+              <summary className="cursor-pointer px-4 py-3 font-medium text-foreground select-none hover:bg-muted/40 rounded-lg transition-colors">
+                {faq.q}
+              </summary>
+              <p className="px-4 pb-3 text-xs text-muted-foreground leading-relaxed">{faq.a}</p>
+            </details>
+          ))}
         </div>
       </section>
 

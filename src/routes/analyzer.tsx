@@ -261,6 +261,7 @@ function Analyzer() {
           {activeTab === "brief" && (
             <DoctorBriefView
               brief={analysis.brief ?? buildDoctorBrief(analysis.pipeline)}
+              reportName={reportTitle}
             />
           )}
 
