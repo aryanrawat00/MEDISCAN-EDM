@@ -1,3 +1,4 @@
+import { T, useI18n } from "@/lib/i18n";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, useMemo } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -50,6 +51,7 @@ const KIND_META: Record<string, { label: string; icon: React.ReactNode; color: s
 };
 
 function History() {
+  const { t } = useI18n();
   const qc = useQueryClient();
   const { data: items = [], isLoading } = useQuery({
     queryKey: ["analyses"],
@@ -78,7 +80,7 @@ function History() {
   const del = useMutation({
     mutationFn: (id: string) => deleteAnalysis(id),
     onSuccess: () => {
-      toast.success("Deleted");
+      toast.success(t("Deleted"));
       qc.invalidateQueries({ queryKey: ["analyses"] });
     },
     onError: (e: Error) => toast.error(e.message),
@@ -91,9 +93,9 @@ function History() {
           <HistoryIcon className="h-5 w-5" />
         </div>
         <div>
-          <h1 className="text-2xl font-bold">Analysis History</h1>
+          <h1 className="text-2xl font-bold"> <T>{"Analysis History"}</T> </h1>
           <p className="text-sm text-muted-foreground">
-            {items.length} saved {items.length === 1 ? "analysis" : "analyses"}
+            {items.length}  <T>{"saved"}</T> {items.length === 1 ? t("analysis") : t("analyses")}
           </p>
         </div>
       </div>
@@ -104,7 +106,7 @@ function History() {
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Search history..."
+              placeholder={t("Search history...")}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="pl-9"
@@ -120,7 +122,7 @@ function History() {
                   : "border-border text-muted-foreground hover:border-foreground/30"
               }`}
             >
-              All ({items.length})
+               <T>{"All ("}</T> {items.length})
             </button>
             {Object.entries(kindCounts).map(([kind, count]) => {
               const meta = KIND_META[kind] || { label: kind, icon: null, color: "bg-muted text-foreground border-border" };
@@ -160,35 +162,30 @@ function History() {
             <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-muted/60">
               <HistoryIcon className="h-8 w-8 text-muted-foreground/60" />
             </div>
-            <h3 className="text-lg font-semibold">No saved analyses yet</h3>
+            <h3 className="text-lg font-semibold"> <T>{"No saved analyses yet"}</T> </h3>
             <p className="mt-2 mx-auto max-w-sm text-sm text-muted-foreground">
-              Your analysis history will appear here once you save a report analysis or medicine scan.
-            </p>
+               <T>{"Your analysis history will appear here once you save a report analysis or medicine scan."}</T> </p>
             <div className="mt-6 flex flex-wrap justify-center gap-3">
               <Link to="/analyzer">
                 <Button variant="outline" className="gap-2">
-                  <FileText className="h-4 w-4" /> Analyze a Report
-                </Button>
+                  <FileText className="h-4 w-4" />  <T>{"Analyze a Report"}</T> </Button>
               </Link>
               <Link to="/medicines">
                 <Button variant="outline" className="gap-2">
-                  <Pill className="h-4 w-4" /> Scan Medicine
-                </Button>
+                  <Pill className="h-4 w-4" />  <T>{"Scan Medicine"}</T> </Button>
               </Link>
               <Link to="/demo">
                 <Button variant="ghost" className="gap-2 text-amber-600 dark:text-amber-400">
-                  <Sparkles className="h-4 w-4" /> Try the Demo
-                </Button>
+                  <Sparkles className="h-4 w-4" />  <T>{"Try the Demo"}</T> </Button>
               </Link>
             </div>
           </div>
         ) : filtered.length === 0 ? (
           <div className="p-8 text-center">
             <Search className="mx-auto h-8 w-8 text-muted-foreground/40 mb-2" />
-            <p className="text-sm text-muted-foreground">No results match your search.</p>
+            <p className="text-sm text-muted-foreground"> <T>{"No results match your search."}</T> </p>
             <Button variant="ghost" size="sm" className="mt-2" onClick={() => { setSearch(""); setKindFilter(null); }}>
-              Clear filters
-            </Button>
+               <T>{"Clear filters"}</T> </Button>
           </div>
         ) : (
           <ul className="divide-y divide-border">
@@ -223,7 +220,7 @@ function History() {
                       size="icon"
                       className="shrink-0 text-muted-foreground hover:text-destructive"
                       onClick={() => {
-                        if (confirm("Delete this analysis?")) del.mutate(a.id);
+                        if (confirm(t("Delete this analysis?"))) del.mutate(a.id);
                       }}
                     >
                       <Trash2 className="h-4 w-4" />
@@ -241,27 +238,27 @@ function History() {
 }
 
 function Detail({ a }: { a: AnalysisRow }) {
+  const { t } = useI18n();
   const [showInput, setShowInput] = useState(false);
 
   return (
     <div className="mt-4 space-y-4 rounded-xl border border-border bg-card p-5 text-sm shadow-sm">
       <div className="flex items-center justify-between border-b border-border pb-3">
         <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-          Analysis Result
-        </span>
+           <T>{"Analysis Result"}</T> </span>
         <Button
           variant="ghost"
           size="sm"
           className="text-xs h-7"
           onClick={() => setShowInput(!showInput)}
         >
-          {showInput ? "Hide Source Input" : "Show Source Input"}
+          {showInput ? t("Hide Source Input") : t("Show Source Input")}
         </Button>
       </div>
 
       {showInput && (
         <div className="rounded-lg bg-muted/40 p-3">
-          <p className="text-xs font-semibold text-muted-foreground">Source Input</p>
+          <p className="text-xs font-semibold text-muted-foreground"> <T>{"Source Input"}</T> </p>
           <pre className="mt-1 max-h-48 overflow-auto whitespace-pre-wrap font-mono text-xs text-foreground">
             {a.input}
           </pre>

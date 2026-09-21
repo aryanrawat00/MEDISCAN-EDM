@@ -1,3 +1,4 @@
+import { I18nProvider, T, useI18n } from "@/lib/i18n";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   Outlet,
@@ -21,17 +22,15 @@ function NotFoundComponent() {
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
         <h1 className="text-7xl font-bold brand-text-gradient">404</h1>
-        <h2 className="mt-4 text-xl font-semibold text-foreground">Page not found</h2>
+        <h2 className="mt-4 text-xl font-semibold text-foreground"> <T>{"Page not found"}</T> </h2>
         <p className="mt-2 text-sm text-muted-foreground">
-          The page you're looking for doesn't exist or has been moved.
-        </p>
+           <T>{"The page you're looking for doesn't exist or has been moved."}</T> </p>
         <div className="mt-6">
           <Link
             to="/"
             className="inline-flex items-center justify-center rounded-md brand-gradient px-4 py-2 text-sm font-medium text-white"
           >
-            Go home
-          </Link>
+             <T>{"Go home"}</T> </Link>
         </div>
       </div>
     </div>
@@ -49,11 +48,9 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
         <h1 className="text-xl font-semibold tracking-tight text-foreground">
-          This page didn't load
-        </h1>
+           <T>{"This page didn't load"}</T> </h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Something went wrong on our end. You can try refreshing or head back home.
-        </p>
+           <T>{"Something went wrong on our end. You can try refreshing or head back home."}</T> </p>
         <div className="mt-6 flex flex-wrap justify-center gap-2">
           <button
             onClick={() => {
@@ -62,14 +59,12 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
             }}
             className="inline-flex items-center justify-center rounded-md brand-gradient px-4 py-2 text-sm font-medium text-white"
           >
-            Try again
-          </button>
+             <T>{"Try again"}</T> </button>
           <a
             href="/"
             className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
           >
-            Go home
-          </a>
+             <T>{"Go home"}</T> </a>
         </div>
       </div>
     </div>
@@ -116,29 +111,31 @@ function RootShell({ children }: { children: ReactNode }) {
 }
 
 function RootComponent() {
+  const { t } = useI18n();
   const { queryClient } = Route.useRouteContext();
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
+      <I18nProvider><ThemeProvider>
         <AuthProvider>
-          <div className="flex min-h-screen flex-col bg-background text-foreground">
+          <div className="medical-shell flex min-h-screen flex-col text-foreground">
             <Navbar />
             <main id="main-content" className="flex-1">
               <Outlet />
             </main>
-            <footer className="border-t border-border/60 py-6 text-center text-xs text-muted-foreground print:hidden">
-              <div className="flex flex-wrap items-center justify-center gap-4">
-                <Link to="/about" className="hover:text-foreground">About</Link>
-                <Link to="/contact" className="hover:text-foreground">Contact</Link>
-                <Link to="/demo" className="hover:text-foreground">Demo Lab</Link>
+            <footer className="border-t border-border bg-card py-10 text-sm print:hidden">
+              <div className="home-container flex flex-col justify-between gap-7 sm:flex-row">
+                <div><Link to="/" className="text-lg font-bold tracking-tight">MediScan<span className="text-teal-600">.</span></Link><p className="mt-2 text-xs text-muted-foreground"><T>A little clarity for your health journey.</T></p></div>
+                <nav aria-label={t("Footer")} className="flex max-w-xl flex-wrap gap-x-6 gap-y-3 text-xs text-muted-foreground">
+                  {[{to:"/analyzer",label:t("Analyze Report")},{to:"/medicines",label:t("Medicine Lens")},{to:"/medicines",hash:"drug-interaction-checker",label:t("Interactions")},{to:"/history",label:t("History")},{to:"/about",label:t("About")},{to:"/about",hash:"faq",label:t("FAQ")},{to:"/about",hash:"privacy",label:t("Privacy")},{to:"/about",hash:"disclaimer",label:t("Disclaimer")},{to:"/demo",label:t("Guided demo")}].map(item=><Link key={item.label} to={item.to} hash={item.hash} className="hover:text-foreground"><T>{item.label}</T></Link>)}
+                </nav>
               </div>
-              <p className="mt-2">© {new Date().getFullYear()} MediScan AI · Educational use only. Not medical advice.</p>
+              <p className="home-container mt-8 border-t border-border pt-5 text-xs text-muted-foreground">© {new Date().getFullYear()} MediScan · <T>Educational use only. Not medical advice.</T></p>
             </footer>
 
           </div>
           <Toaster richColors position="top-right" />
         </AuthProvider>
-      </ThemeProvider>
+      </ThemeProvider></I18nProvider>
     </QueryClientProvider>
   );
 }

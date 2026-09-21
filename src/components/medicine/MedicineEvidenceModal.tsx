@@ -1,3 +1,5 @@
+import { T, useI18n } from "@/lib/i18n";
+import * as DialogPrimitive from "@radix-ui/react-dialog";
 /**
  * src/components/medicine/MedicineEvidenceModal.tsx
  * Interactive Packaging OCR Evidence Verification Modal for Medicine Lens.
@@ -31,23 +33,18 @@ export function MedicineEvidenceModal({
   isOpen,
   onClose,
 }: MedicineEvidenceModalProps) {
+  const { t } = useI18n();
   if (!isOpen || !ingredient) return null;
 
   const isVerified = ingredient.verified;
 
   return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="medicine-evidence-title"
-      className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 p-4 backdrop-blur-xs animate-in fade-in"
-    >
-      <div className="relative w-full max-w-lg rounded-2xl border border-border bg-card p-6 shadow-xl sm:p-7 space-y-5 max-h-[90vh] overflow-y-auto">
+    <DialogPrimitive.Root open={isOpen} onOpenChange={open => { if (!open) onClose(); }}><DialogPrimitive.Portal><DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-slate-950/35 backdrop-blur-xs" /><DialogPrimitive.Content aria-describedby={undefined} className="fixed left-1/2 top-1/2 z-50 max-h-[90dvh] w-[calc(100%-2rem)] max-w-lg -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-2xl border border-border bg-card p-6 shadow-xl sm:p-7 space-y-5" onCloseAutoFocus={event => { event.preventDefault(); }}>
         {/* Close Button */}
         <button
           type="button"
           onClick={onClose}
-          aria-label="Close Medicine Evidence Verification"
+          aria-label={t("Close Medicine Evidence Verification")}
           className="absolute right-4 top-4 rounded-lg p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
         >
           <X className="h-5 w-5" />
@@ -59,11 +56,10 @@ export function MedicineEvidenceModal({
             <Pill className="h-5 w-5" />
           </div>
           <div>
-            <h2 id="medicine-evidence-title" className="text-lg font-bold tracking-tight text-foreground">
-              Medicine Packaging Evidence Verification
-            </h2>
+            <DialogPrimitive.Title id="medicine-evidence-title" className="text-lg font-bold tracking-tight text-foreground">
+               <T>{"Medicine Packaging Evidence Verification"}</T> </DialogPrimitive.Title>
             <p className="text-xs text-muted-foreground">
-              OCR evidence check for <strong>{ingredient.name}</strong>
+               <T>{"OCR evidence check for"}</T> <strong>{ingredient.name}</strong>
             </p>
           </div>
         </div>
@@ -73,12 +69,12 @@ export function MedicineEvidenceModal({
           {isVerified ? (
             <div className="flex items-center gap-2 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-3.5 py-2 text-xs font-semibold text-emerald-700 dark:text-emerald-300">
               <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600" />
-              <span>✓ Packaging evidence verified from OCR text</span>
+              <span> <T>{"✓ Packaging evidence verified from OCR text"}</T> </span>
             </div>
           ) : (
             <div className="flex items-center gap-2 rounded-xl border border-rose-500/30 bg-rose-500/10 px-3.5 py-2 text-xs font-semibold text-rose-700 dark:text-rose-300">
               <ShieldAlert className="h-4 w-4 shrink-0 text-rose-600" />
-              <span>Evidence could not be confirmed on packaging</span>
+              <span> <T>{"Evidence could not be confirmed on packaging"}</T> </span>
             </div>
           )}
         </div>
@@ -89,15 +85,13 @@ export function MedicineEvidenceModal({
           <div className="grid grid-cols-2 gap-3">
             <div className="rounded-xl border border-border/70 bg-card p-3 space-y-1">
               <span className="font-semibold uppercase text-[10px] tracking-wider text-muted-foreground">
-                Medicine Identity
-              </span>
+                 <T>{"Medicine Identity"}</T> </span>
               <p className="font-bold text-sm text-foreground">{ingredient.name}</p>
             </div>
 
             <div className="rounded-xl border border-border/70 bg-card p-3 space-y-1">
               <span className="font-semibold uppercase text-[10px] tracking-wider text-muted-foreground">
-                Detected Strength
-              </span>
+                 <T>{"Detected Strength"}</T> </span>
               <p className="font-bold text-sm text-foreground">
                 {ingredient.strength || "Unspecified strength"}
               </p>
@@ -108,7 +102,7 @@ export function MedicineEvidenceModal({
           <div className="space-y-1.5">
             <div className="flex items-center gap-1 font-semibold uppercase tracking-wider text-[10px] text-muted-foreground">
               <Quote className="h-3 w-3 text-primary" />
-              <span>Original Packaging Evidence</span>
+              <span> <T>{"Original Packaging Evidence"}</T> </span>
             </div>
             <blockquote className="rounded-xl bg-muted/40 p-3.5 font-mono text-xs text-foreground border-l-3 border-primary leading-relaxed">
               "{ingredient.evidenceQuote}"
@@ -118,8 +112,7 @@ export function MedicineEvidenceModal({
           {/* OCR Verification Checklist */}
           <div className="rounded-xl border border-border/70 bg-card p-4 space-y-2">
             <span className="font-semibold uppercase text-[10px] tracking-wider text-muted-foreground">
-              OCR Evidence Checklist
-            </span>
+               <T>{"OCR Evidence Checklist"}</T> </span>
             <ul className="space-y-2 text-xs pt-1">
               <li className="flex items-center gap-2">
                 <CheckCircle2
@@ -130,8 +123,7 @@ export function MedicineEvidenceModal({
                   }`}
                 />
                 <span className={ingredient.checks.quoteFound ? "text-foreground font-medium" : "text-muted-foreground"}>
-                  Quote located in transcribed packaging text
-                </span>
+                   <T>{"Quote located in transcribed packaging text"}</T> </span>
               </li>
               <li className="flex items-center gap-2">
                 <CheckCircle2
@@ -142,8 +134,7 @@ export function MedicineEvidenceModal({
                   }`}
                 />
                 <span className={ingredient.checks.nameInQuote ? "text-foreground font-medium" : "text-muted-foreground"}>
-                  Active ingredient name present in evidence quote
-                </span>
+                   <T>{"Active ingredient name present in evidence quote"}</T> </span>
               </li>
               <li className="flex items-center gap-2">
                 <CheckCircle2
@@ -154,8 +145,7 @@ export function MedicineEvidenceModal({
                   }`}
                 />
                 <span className={ingredient.checks.strengthInQuote ? "text-foreground font-medium" : "text-muted-foreground"}>
-                  Dosage strength token matched in evidence quote
-                </span>
+                   <T>{"Dosage strength token matched in evidence quote"}</T> </span>
               </li>
             </ul>
           </div>
@@ -164,21 +154,19 @@ export function MedicineEvidenceModal({
           <div className="rounded-xl bg-muted/30 p-3.5 border border-border/60 space-y-1">
             <span className="font-semibold uppercase text-[10px] tracking-wider text-muted-foreground flex items-center gap-1">
               <Bookmark className="h-3 w-3 text-primary" />
-              Official Reference Monograph
-            </span>
+               <T>{"Official Reference Monograph"}</T> </span>
             {ingredient.matchedMonograph ? (
               <div>
                 <p className="font-semibold text-foreground text-xs">
                   {ingredient.matchedMonograph.displayName}
                 </p>
                 <p className="text-[11px] text-muted-foreground mt-0.5">
-                  Category: {ingredient.matchedMonograph.category} · Reviewed by {ingredient.matchedMonograph.review.by}
+                   <T>{"Category:"}</T> {ingredient.matchedMonograph.category}  <T>{"· Reviewed by"}</T> {ingredient.matchedMonograph.review.by}
                 </p>
               </div>
             ) : (
               <p className="text-muted-foreground italic text-xs">
-                No approved openFDA OTC monograph associated with this ingredient name.
-              </p>
+                 <T>{"No approved openFDA OTC monograph associated with this ingredient name."}</T> </p>
             )}
           </div>
 
@@ -186,12 +174,12 @@ export function MedicineEvidenceModal({
           <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-3 text-xs text-emerald-800 dark:text-emerald-300">
             <div className="flex items-center gap-1.5 font-bold">
               <FileCheck className="h-4 w-4 text-emerald-600" />
-              <span>Verification Verdict</span>
+              <span> <T>{"Verification Verdict"}</T> </span>
             </div>
             <p className="mt-1 text-[11px] leading-relaxed">
               {isVerified
-                ? "✓ Identity and dosage are supported by verbatim packaging OCR evidence."
-                : "Packaging OCR text is insufficient to confirm this ingredient's identity or strength."}
+                ? t("✓ Identity and dosage are supported by verbatim packaging OCR evidence.")
+                : t("Packaging OCR text is insufficient to confirm this ingredient's identity or strength.")}
             </p>
           </div>
         </div>
@@ -199,10 +187,8 @@ export function MedicineEvidenceModal({
         {/* Modal Footer */}
         <div className="border-t border-border pt-4 flex justify-end">
           <Button type="button" variant="outline" size="sm" onClick={onClose} className="h-9 px-4 text-xs">
-            Close
-          </Button>
+             <T>{"Close"}</T> </Button>
         </div>
-      </div>
-    </div>
+</DialogPrimitive.Content></DialogPrimitive.Portal></DialogPrimitive.Root>
   );
 }

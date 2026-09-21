@@ -1,3 +1,4 @@
+import { T, useI18n } from "@/lib/i18n";
 /**
  * src/routes/medicines.tsx
  * M06: Medicine Lens Route (Blueprint §10).
@@ -48,6 +49,7 @@ export const Route = createFileRoute("/medicines")({
 type MedicineTab = "ingredients" | "monograph" | "evidence" | "interactions";
 
 function MedicineLens() {
+  const { t } = useI18n();
   const { user } = useAuth();
   const qc = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -74,7 +76,7 @@ function MedicineLens() {
     if (!file) return;
 
     if (!file.type.startsWith("image/")) {
-      toast.error("Please upload an image file (JPEG, PNG, WebP).");
+      toast.error(t("Please upload an image file (JPEG, PNG, WebP)."));
       return;
     }
 
@@ -94,13 +96,13 @@ function MedicineLens() {
         })
           .then(() => {
             qc.invalidateQueries({ queryKey: ["analyses"] });
-            toast.success("Medicine scan saved to your private history.");
+            toast.success(t("Medicine scan saved to your private history."));
           })
           .catch((err) => {
             console.warn("Failed to auto-save medicine scan:", err);
           });
       } else {
-        toast.info("Scan completed in Guest Mode. Sign in anytime to save your results to permanent history.");
+        toast.info(t("Scan completed in Guest Mode. Sign in anytime to save your results to permanent history."));
       }
     }
   };
@@ -153,16 +155,13 @@ function MedicineLens() {
         <div className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border/80 bg-muted/40 px-4 py-3 text-xs text-foreground print:hidden">
           <div className="flex items-center gap-2">
             <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-0.5 font-semibold text-primary">
-              <Sparkles className="h-3 w-3" /> Guest Session
-            </span>
+              <Sparkles className="h-3 w-3" />  <T>{"Guest Session"}</T> </span>
             <span className="text-muted-foreground">
-              Live medicine packaging vision and openFDA monograph lookup active. Results remain in session memory.
-            </span>
+               <T>{"Your results stay in this session. Sign in to keep them in your history."}</T> </span>
           </div>
           <Button asChild size="sm" variant="outline" className="h-7 text-xs">
             <Link to="/login">
-              <LogIn className="mr-1.5 h-3 w-3" /> Sign in to save history
-            </Link>
+              <LogIn className="mr-1.5 h-3 w-3" />  <T>{"Sign in to save history"}</T> </Link>
           </Button>
         </div>
       )}
@@ -174,22 +173,21 @@ function MedicineLens() {
             <Pill className="h-6 w-6" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold tracking-tight">Medicine Lens</h1>
+            <h1 className="text-2xl font-bold tracking-tight"> <T>{"Medicine Lens"}</T> </h1>
             <p className="text-sm text-muted-foreground">
-              Verify packaging labels, active ingredients, and official openFDA drug monographs.
-            </p>
+               <T>{"Search a name or upload a package photo to understand your medicine."}</T> </p>
           </div>
         </div>
 
         {(scan || selectedMonograph) && (
           <Button variant="outline" size="sm" onClick={handleReset}>
-            <RotateCcw className="mr-1.5 h-3.5 w-3.5" /> New Lookup / Scan
-          </Button>
+            <RotateCcw className="mr-1.5 h-3.5 w-3.5" />  <T>{"New Lookup / Scan"}</T> </Button>
         )}
       </div>
 
       <Disclaimer className="mt-4 print:hidden" />
 
+      {error && <div role="alert" className="mt-5 rounded-xl border border-destructive/30 bg-card p-4 text-sm text-destructive">{error}</div>}
       {/* Main Content Area */}
       {!scan ? (
         <div className="mt-8 space-y-8">
@@ -202,14 +200,15 @@ function MedicineLens() {
                   <Camera className="h-5 w-5" />
                 </div>
                 <div>
-                  <h2 className="font-semibold text-base">Package Lens Scan</h2>
+                  <h2 className="font-semibold text-base"> <T>{"Scan a package"}</T> </h2>
                   <p className="text-xs text-muted-foreground">
-                    Photograph a medicine box, strip, or bottle label.
-                  </p>
+                     <T>{"Photograph a medicine box, strip, or bottle label."}</T> </p>
                 </div>
               </div>
 
               <div
+                role="button" tabIndex={isScanning ? -1 : 0} aria-label={t("Upload packaging photo")} aria-disabled={isScanning}
+                onKeyDown={e => { if (!isScanning && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); fileInputRef.current?.click(); } }}
                 onClick={() => !isScanning && fileInputRef.current?.click()}
                 className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-border/80 bg-muted/20 p-8 text-center cursor-pointer transition-all hover:border-primary/50 hover:bg-muted/30"
               >
@@ -217,19 +216,17 @@ function MedicineLens() {
                   <div className="space-y-3">
                     <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto" />
                     <p className="text-sm font-medium">
-                      {status === "PROCESSING_IMAGE" ? "Preparing image…" : "Reading packaging label…"}
+                      {status === "PROCESSING_IMAGE" ? t("Preparing image…") : t("Reading packaging label…")}
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      Extracting text and verifying active ingredients…
-                    </p>
+                       <T>{"Extracting text and verifying active ingredients…"}</T> </p>
                   </div>
                 ) : (
                   <>
                     <Upload className="h-8 w-8 text-muted-foreground/80 mb-2" />
-                    <p className="text-sm font-medium">Click to upload packaging photo</p>
+                    <p className="text-sm font-medium"> <T>{"Click to upload packaging photo"}</T> </p>
                     <p className="text-xs text-muted-foreground mt-1">
-                      JPEG, PNG, WebP up to 5 MB
-                    </p>
+                       <T>{"JPEG, PNG, WebP up to 5 MB"}</T> </p>
                   </>
                 )}
                 <input
@@ -251,19 +248,19 @@ function MedicineLens() {
                   <Search className="h-5 w-5" />
                 </div>
                 <div>
-                  <h2 className="font-semibold text-base">Official Monograph Lookup</h2>
+                  <h2 className="font-semibold text-base"> <T>{"Find a medicine"}</T> </h2>
                   <p className="text-xs text-muted-foreground">
-                    Search human-reviewed openFDA OTC drug labels.
-                  </p>
+                     <T>{"Search by medicine, brand, or ingredient name."}</T> </p>
                 </div>
               </div>
 
               <div className="relative">
                 <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
+                  aria-label={t("Medicine name")}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="e.g. Paracetamol, Advil, Cetirizine, Omeprazole…"
+                  placeholder={t("e.g. Paracetamol, Advil, Cetirizine, Omeprazole…")}
                   className="pl-9 text-sm"
                 />
               </div>
@@ -276,12 +273,12 @@ function MedicineLens() {
                       key={m.key}
                       className="flex items-center justify-between p-3 hover:bg-muted/40 transition-colors text-xs"
                     >
-                      <div
+                      <button type="button"
                         onClick={() => {
                           setSelectedMonograph(m);
                           toast.success(`Loaded FDA monograph: ${m.displayName}`);
                         }}
-                        className="flex-1 cursor-pointer pr-2"
+                        className="flex-1 cursor-pointer pr-2 text-left"
                       >
                         <div className="flex items-center gap-2">
                           <span className="font-semibold text-foreground">{m.displayName}</span>
@@ -290,26 +287,24 @@ function MedicineLens() {
                           </span>
                         </div>
                         <p className="text-muted-foreground mt-0.5 line-clamp-1">{m.purposeText}</p>
-                      </div>
+                      </button>
                       <Button
                         type="button"
                         variant="outline"
                         size="sm"
                         onClick={() => handleAddToChecker(m.displayName)}
                         className="h-7 px-2 text-[11px] text-primary border-primary/30 hover:bg-primary/5 shrink-0"
-                        title="Add to interaction check"
+                        title={t("Add to interaction check")}
                       >
-                        <ArrowRightLeft className="h-3 w-3 mr-1" /> + Check
-                      </Button>
+                        <ArrowRightLeft className="h-3 w-3 mr-1" />  <T>{"+ Check"}</T> </Button>
                     </div>
                   ))}
                 </div>
               )}
 
               {searchQuery.trim().length >= 2 && searchResults.length === 0 && (
-                <p className="text-xs text-muted-foreground text-center py-4">
-                  No matching OTC monographs found for "{searchQuery}".
-                </p>
+                <p role="status" className="rounded-xl border border-border bg-muted/30 p-4 text-sm leading-relaxed text-muted-foreground">
+                   <T>{"This medicine is not available in MediScan's current verified reference set. We could not verify a monograph using the available references. This does not mean the medicine is safe or unsafe."}</T> </p>
               )}
             </div>
           </div>
@@ -324,11 +319,10 @@ function MedicineLens() {
                   </div>
                   <div>
                     <h3 className="font-semibold text-base text-foreground">
-                      Approved openFDA Monograph: {selectedMonograph.displayName}
+                       <T>{"Reference information:"}</T> {selectedMonograph.displayName}
                     </h3>
                     <p className="text-xs text-muted-foreground">
-                      Official OTC monograph snapshot · Zero AI hallucination
-                    </p>
+                       <T>{"Reference snapshot from the existing openFDA label registry."}</T> </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
@@ -338,16 +332,14 @@ function MedicineLens() {
                     onClick={() => handleAddToChecker(selectedMonograph.displayName)}
                     className="h-8 px-2.5 text-xs border-primary/40 text-primary hover:bg-primary/5"
                   >
-                    <ArrowRightLeft className="mr-1.5 h-3.5 w-3.5" /> Add to Interaction Check
-                  </Button>
+                    <ArrowRightLeft className="mr-1.5 h-3.5 w-3.5" />  <T>{"Add to Interaction Check"}</T> </Button>
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => setSelectedMonograph(null)}
                     className="h-8 px-2 text-xs"
                   >
-                    <X className="mr-1 h-3.5 w-3.5" /> Close View
-                  </Button>
+                    <X className="mr-1 h-3.5 w-3.5" />  <T>{"Close View"}</T> </Button>
                 </div>
               </div>
 
@@ -362,11 +354,9 @@ function MedicineLens() {
           <div className="space-y-3">
             <div>
               <h3 className="text-sm font-semibold tracking-tight">
-                Try Pre-Verified Sample Medicines
-              </h3>
+                 <T>{"Try Pre-Verified Sample Medicines"}</T> </h3>
               <p className="text-xs text-muted-foreground">
-                Load instant packaging scans with 100% verified openFDA reference monographs.
-              </p>
+                 <T>{"Explore example scans and their supporting references."}</T> </p>
             </div>
 
             <div className="grid gap-3 sm:grid-cols-3">
@@ -382,8 +372,7 @@ function MedicineLens() {
                       {s.category}
                     </span>
                     <span className="inline-flex items-center gap-1 rounded bg-emerald-500/10 px-1.5 py-0.5 text-[10px] font-medium text-emerald-600 dark:text-emerald-400">
-                      <ShieldCheck className="h-3 w-3" /> Verified
-                    </span>
+                      <ShieldCheck className="h-3 w-3" />  <T>{"Verified"}</T> </span>
                   </div>
                   <p className="mt-1 font-semibold text-sm text-foreground">{s.title}</p>
                   <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">
@@ -423,7 +412,7 @@ function MedicineLens() {
                   : "text-muted-foreground hover:bg-muted hover:text-foreground"
               }`}
             >
-              <Layers className="h-3.5 w-3.5" /> Verified Ingredients ({scan.verifiedIngredients.length})
+              <Layers className="h-3.5 w-3.5" />  <T>{"Verified Ingredients ("}</T> {scan.verifiedIngredients.length})
             </button>
             <button
               type="button"
@@ -434,7 +423,7 @@ function MedicineLens() {
                   : "text-muted-foreground hover:bg-muted hover:text-foreground"
               }`}
             >
-              <Bookmark className="h-3.5 w-3.5" /> Reference Monograph ({scan.monographs.length})
+              <Bookmark className="h-3.5 w-3.5" />  <T>{"Reference Monograph ("}</T> {scan.monographs.length})
             </button>
             <button
               type="button"
@@ -445,8 +434,7 @@ function MedicineLens() {
                   : "text-muted-foreground hover:bg-muted hover:text-foreground"
               }`}
             >
-              <FileText className="h-3.5 w-3.5" /> Packaging OCR Evidence
-            </button>
+              <FileText className="h-3.5 w-3.5" />  <T>{"Packaging OCR Evidence"}</T> </button>
             <button
               type="button"
               onClick={() => setActiveTab("interactions")}
@@ -456,8 +444,7 @@ function MedicineLens() {
                   : "text-muted-foreground hover:bg-muted hover:text-foreground"
               }`}
             >
-              <ArrowRightLeft className="h-3.5 w-3.5" /> Drug Interaction Check
-              {interactionCount > 0 ? ` (${interactionCount})` : ""}
+              <ArrowRightLeft className="h-3.5 w-3.5" />  <T>{"Drug Interaction Check"}</T> {interactionCount > 0 ? ` (${interactionCount})` : ""}
             </button>
           </div>
 
@@ -470,8 +457,7 @@ function MedicineLens() {
               {scan.safetyWarnings.length > 0 && (
                 <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-4 space-y-2">
                   <h4 className="text-xs font-semibold text-amber-700 dark:text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
-                    Important Safety Warnings from Official FDA Label
-                  </h4>
+                     <T>{"Important Safety Warnings from Official FDA Label"}</T> </h4>
                   <ul className="list-disc pl-5 text-xs text-muted-foreground space-y-1">
                     {scan.safetyWarnings.map((w, i) => (
                       <li key={i}>{w}</li>

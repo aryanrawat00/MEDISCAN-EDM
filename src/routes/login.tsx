@@ -1,3 +1,4 @@
+import { T } from "@/lib/i18n";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
@@ -23,15 +24,14 @@ function LoginPage() {
         <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl brand-gradient text-white">
           <Stethoscope className="h-6 w-6" />
         </div>
-        <h1 className="mt-6 text-center text-2xl font-semibold">Welcome to MediScan AI</h1>
+        <h1 className="mt-6 text-center text-2xl font-semibold"> <T>{"Welcome to MediScan AI"}</T> </h1>
         <p className="mt-2 text-center text-sm text-muted-foreground">
-          Sign in with Google to save your analyses securely.
-        </p>
+           <T>{"Sign in with Google to save your analyses securely."}</T> </p>
 
         {!configured && (
           <div className="mt-6 rounded-lg border border-amber-500/30 bg-amber-500/5 p-3 text-sm text-amber-700 dark:text-amber-300">
-            Supabase keys are missing. Set <code>VITE_SUPABASE_URL</code> and{" "}
-            <code>VITE_SUPABASE_ANON_KEY</code> in your <code>.env</code>.
+             <T>{"Supabase keys are missing. Set"}</T> <code>VITE_SUPABASE_URL</code>  <T>{"and"}</T> {" "}
+            <code>VITE_SUPABASE_ANON_KEY</code>  <T>{"in your"}</T> <code>.env</code>.
           </div>
         )}
 
@@ -42,15 +42,14 @@ function LoginPage() {
           disabled={!configured || loading}
           onClick={() => signInWithGoogle()}
         >
-          <GoogleIcon /> Continue with Google
-        </Button>
+          <GoogleIcon />  <T>{"Continue with Google"}</T> </Button>
 
         <div className="relative my-6">
           <div className="absolute inset-0 flex items-center">
             <span className="w-full border-t border-border/80" />
           </div>
           <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-card px-2 text-muted-foreground">or try instantly</span>
+            <span className="bg-card px-2 text-muted-foreground"> <T>{"or try instantly"}</T> </span>
           </div>
         </div>
 
@@ -60,16 +59,13 @@ function LoginPage() {
           variant="secondary"
           onClick={() => navigate({ to: "/analyzer" })}
         >
-          Continue as Guest
-        </Button>
+           <T>{"Continue as Guest"}</T> </Button>
 
         <p className="mt-4 text-center text-xs text-muted-foreground">
-          Guest mode gives you full access to Report Analysis and Medicine Packaging Lens. No account required.
-        </p>
+           <T>{"Guest mode gives you full access to Report Analysis and Medicine Packaging Lens. No account required."}</T> </p>
 
         <p className="mt-6 text-center text-[11px] text-muted-foreground/80">
-          Educational use only · Never a substitute for qualified professional medical care.
-        </p>
+           <T>{"Educational use only · Never a substitute for qualified professional medical care."}</T> </p>
       </div>
     </div>
   );

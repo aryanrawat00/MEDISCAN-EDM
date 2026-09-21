@@ -1,3 +1,5 @@
+import * as DialogPrimitive from "@radix-ui/react-dialog";
+import { T, useI18n } from "@/lib/i18n";
 /**
  * src/components/report/EvidenceVerificationModal.tsx
  * Interactive Evidence Verification Inspector Modal.
@@ -39,6 +41,7 @@ export function EvidenceVerificationModal({
   isOpen,
   onClose,
 }: EvidenceVerificationModalProps) {
+  const { t } = useI18n();
   if (!isOpen || !finding) return null;
 
   const { evidence } = finding;
@@ -66,18 +69,12 @@ export function EvidenceVerificationModal({
   }
 
   return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="evidence-verification-title"
-      className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 p-4 backdrop-blur-xs animate-in fade-in"
-    >
-      <div className="relative w-full max-w-lg rounded-2xl border border-border bg-card p-6 shadow-xl sm:p-7 space-y-5 max-h-[90vh] overflow-y-auto">
+    <DialogPrimitive.Root open={isOpen} onOpenChange={open => { if (!open) onClose(); }}><DialogPrimitive.Portal><DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-slate-950/35 backdrop-blur-xs" /><DialogPrimitive.Content aria-describedby={undefined} className="fixed left-1/2 top-1/2 z-50 max-h-[90dvh] w-[calc(100%-2rem)] max-w-lg -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-2xl border border-border bg-card p-6 shadow-xl sm:p-7 space-y-5" onCloseAutoFocus={event => { event.preventDefault(); }}>
         {/* Close Button */}
         <button
           type="button"
           onClick={onClose}
-          aria-label="Close Evidence Verification"
+          aria-label={t("Close Evidence Verification")}
           className="absolute right-4 top-4 rounded-lg p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
         >
           <X className="h-5 w-5" />
@@ -89,11 +86,10 @@ export function EvidenceVerificationModal({
             <ShieldCheck className="h-5 w-5" />
           </div>
           <div>
-            <h2 id="evidence-verification-title" className="text-lg font-bold tracking-tight text-foreground">
-              Evidence Verification
-            </h2>
+            <DialogPrimitive.Title id="evidence-verification-title" className="text-lg font-bold tracking-tight text-foreground">
+               <T>{"Evidence Verification"}</T> </DialogPrimitive.Title>
             <p className="text-xs text-muted-foreground">
-              Deterministic verification audit for <strong>{finding.testName}</strong>
+               <T>{"Deterministic verification audit for"}</T> <strong>{finding.testName}</strong>
             </p>
           </div>
         </div>
@@ -103,19 +99,19 @@ export function EvidenceVerificationModal({
           {verificationState === "VERIFIED" && (
             <div className="flex items-center gap-2 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-3.5 py-2 text-xs font-semibold text-emerald-700 dark:text-emerald-300">
               <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600" />
-              <span>✓ Evidence verified against verbatim report source</span>
+              <span> <T>{"✓ Evidence verified against verbatim report source"}</T> </span>
             </div>
           )}
           {verificationState === "UNVERIFIED" && (
             <div className="flex items-center gap-2 rounded-xl border border-rose-500/30 bg-rose-500/10 px-3.5 py-2 text-xs font-semibold text-rose-700 dark:text-rose-300">
               <ShieldAlert className="h-4 w-4 shrink-0 text-rose-600" />
-              <span>Evidence could not be verified</span>
+              <span> <T>{"Evidence could not be verified"}</T> </span>
             </div>
           )}
           {verificationState === "SOURCE_UNAVAILABLE" && (
             <div className="flex items-center gap-2 rounded-xl border border-slate-500/30 bg-slate-500/10 px-3.5 py-2 text-xs font-semibold text-slate-700 dark:text-slate-300">
               <HelpCircle className="h-4 w-4 shrink-0 text-slate-500" />
-              <span>Raw source evidence unavailable</span>
+              <span> <T>{"Raw source evidence unavailable"}</T> </span>
             </div>
           )}
         </div>
@@ -125,14 +121,13 @@ export function EvidenceVerificationModal({
           {/* Finding explanation */}
           <div className="rounded-xl bg-muted/30 p-3.5 border border-border/60 space-y-1">
             <span className="font-semibold uppercase text-[10px] tracking-wider text-muted-foreground">
-              Finding
-            </span>
+               <T>{"Finding"}</T> </span>
             <div className="flex items-center justify-between gap-2">
               <span className="font-bold text-sm text-foreground">{finding.testName}</span>
               <StatusBadge status={finding.status} />
             </div>
             <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
-              {findingExplanation}
+              {t(findingExplanation)}
             </p>
           </div>
 
@@ -140,8 +135,7 @@ export function EvidenceVerificationModal({
           <div className="grid grid-cols-2 gap-3">
             <div className="rounded-xl border border-border/70 bg-card p-3 space-y-1">
               <span className="font-semibold uppercase text-[10px] tracking-wider text-muted-foreground">
-                Extracted Value
-              </span>
+                 <T>{"Extracted Value"}</T> </span>
               <p className="font-bold text-sm text-foreground">
                 {finding.valueText} {finding.unit ?? ""}
               </p>
@@ -149,8 +143,7 @@ export function EvidenceVerificationModal({
 
             <div className="rounded-xl border border-border/70 bg-card p-3 space-y-1">
               <span className="font-semibold uppercase text-[10px] tracking-wider text-muted-foreground">
-                Reference Interval
-              </span>
+                 <T>{"Reference Interval"}</T> </span>
               <p className="font-medium text-xs text-foreground">
                 {finding.referenceRangeText || "No printed bounds"}
               </p>
@@ -161,7 +154,7 @@ export function EvidenceVerificationModal({
           <div className="rounded-xl border border-primary/20 bg-primary/5 p-3.5 space-y-1">
             <div className="flex items-center gap-1.5 font-semibold text-primary text-[11px] uppercase tracking-wider">
               <Terminal className="h-3.5 w-3.5" />
-              <span>Rule Applied</span>
+              <span> <T>{"Rule Applied"}</T> </span>
             </div>
             <p className="font-mono text-xs text-foreground font-medium">
               {ruleText}
@@ -173,8 +166,7 @@ export function EvidenceVerificationModal({
             <div className="flex items-center justify-between text-[11px]">
               <span className="font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1">
                 <Quote className="h-3 w-3 text-primary" />
-                Original Evidence Quote
-              </span>
+                 <T>{"Original Evidence Quote"}</T> </span>
               <span className="text-muted-foreground">
                 {evidence.page ? `Page ${evidence.page}` : "Extracted Span"}
               </span>
@@ -185,8 +177,7 @@ export function EvidenceVerificationModal({
               </blockquote>
             ) : (
               <p className="rounded-xl bg-muted/20 p-3 italic text-muted-foreground text-xs">
-                No verbatim text quote anchored to this finding.
-              </p>
+                 <T>{"No verbatim text quote anchored to this finding."}</T> </p>
             )}
           </div>
 
@@ -194,21 +185,20 @@ export function EvidenceVerificationModal({
           <div className="flex items-center justify-between rounded-xl bg-muted/20 p-3 text-xs border border-border/60">
             <div className="flex items-center gap-2">
               <FileText className="h-4 w-4 text-muted-foreground" />
-              <span className="text-muted-foreground">Source:</span>
+              <span className="text-muted-foreground"> <T>{"Source:"}</T> </span>
               <span className="font-medium text-foreground truncate max-w-[220px]">
                 {reportTitle}
               </span>
             </div>
             <span className="rounded bg-muted px-2 py-0.5 font-mono text-[11px] text-foreground">
-              {evidence.page ? `Page ${evidence.page}` : "Uploaded Report"}
+              {evidence.page ? `Page ${evidence.page}` : t("Uploaded Report")}
             </span>
           </div>
 
           {/* Verification Checklist */}
           <div className="rounded-xl border border-border/70 bg-card p-4 space-y-2">
             <span className="font-semibold uppercase text-[10px] tracking-wider text-muted-foreground">
-              Deterministic Verification Audit
-            </span>
+               <T>{"Deterministic Verification Audit"}</T> </span>
             <ul className="space-y-2 text-xs pt-1">
               <li className="flex items-center gap-2">
                 <CheckCircle2
@@ -219,8 +209,7 @@ export function EvidenceVerificationModal({
                   }`}
                 />
                 <span className={evidence.checks.quoteFound ? "text-foreground font-medium" : "text-muted-foreground"}>
-                  Evidence found in original document text
-                </span>
+                   <T>{"Evidence found in original document text"}</T> </span>
               </li>
               <li className="flex items-center gap-2">
                 <CheckCircle2
@@ -231,14 +220,12 @@ export function EvidenceVerificationModal({
                   }`}
                 />
                 <span className={evidence.checks.valueInQuote ? "text-foreground font-medium" : "text-muted-foreground"}>
-                  Value matches extracted data outside range boundaries
-                </span>
+                   <T>{"Value matches extracted data outside range boundaries"}</T> </span>
               </li>
               <li className="flex items-center gap-2">
                 <CheckCircle2 className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
                 <span className="text-foreground font-medium">
-                  Deterministic classification rule applied
-                </span>
+                   <T>{"Deterministic classification rule applied"}</T> </span>
               </li>
             </ul>
           </div>
@@ -247,10 +234,8 @@ export function EvidenceVerificationModal({
         {/* Modal Footer */}
         <div className="border-t border-border pt-4 flex justify-end">
           <Button type="button" variant="outline" size="sm" onClick={onClose} className="h-9 px-4 text-xs">
-            Close
-          </Button>
+             <T>{"Close"}</T> </Button>
         </div>
-      </div>
-    </div>
+</DialogPrimitive.Content></DialogPrimitive.Portal></DialogPrimitive.Root>
   );
 }

@@ -1,3 +1,4 @@
+import { T, useI18n } from "@/lib/i18n";
 /**
  * src/components/report/PipelineTrace.tsx
  * T16: Pipeline Execution Trace and Telemetry (Blueprint §18).
@@ -14,6 +15,7 @@ interface PipelineTraceProps {
 }
 
 export function PipelineTrace({ pipeline, className = "" }: PipelineTraceProps) {
+  const { t } = useI18n();
   const { stats, trace, unverified } = pipeline;
 
   return (
@@ -21,35 +23,35 @@ export function PipelineTrace({ pipeline, className = "" }: PipelineTraceProps) 
       {/* Stats Cards */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
         <StatCard
-          label="Raw Extracted"
+          label={t("Raw Extracted")}
           value={stats.raw}
-          desc="Identified by AI"
+          desc={t("Identified by AI")}
           icon={<Brain className="h-4 w-4 text-primary" />}
         />
         <StatCard
-          label="Evidence Locked"
+          label={t("Evidence Locked")}
           value={stats.verified}
-          desc="100% Quote Match"
+          desc={t("100% Quote Match")}
           icon={<ShieldCheck className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />}
           highlight={stats.verified > 0}
         />
         <StatCard
-          label="Flagged Abnormal"
+          label={t("Flagged Abnormal")}
           value={stats.flagged}
-          desc="Outside Range"
+          desc={t("Outside Range")}
           icon={<AlertTriangle className="h-4 w-4 text-rose-500" />}
           color="text-rose-600 dark:text-rose-400"
         />
         <StatCard
-          label="Unverified"
+          label={t("Unverified")}
           value={stats.unverified}
-          desc="Failed Quote Match"
+          desc={t("Failed Quote Match")}
           color={stats.unverified > 0 ? "text-amber-600 dark:text-amber-400" : undefined}
         />
         <StatCard
-          label="Excluded"
+          label={t("Excluded")}
           value={stats.excluded}
-          desc="R-ELIG Filtered"
+          desc={t("R-ELIG Filtered")}
         />
       </div>
 
@@ -58,10 +60,10 @@ export function PipelineTrace({ pipeline, className = "" }: PipelineTraceProps) 
         <div className="flex items-center justify-between border-b border-border/60 pb-2.5">
           <div className="flex items-center gap-2 text-xs font-semibold uppercase text-muted-foreground">
             <Layers className="h-4 w-4" />
-            <span>Execution Stage Trace</span>
+            <span> <T>{"Execution Stage Trace"}</T> </span>
           </div>
           <span className="text-xs font-mono text-muted-foreground">
-            Total Pipeline Time: {trace.reduce((acc, t) => acc + t.ms, 0)} ms
+             <T>{"Total Pipeline Time:"}</T> {trace.reduce((acc, t) => acc + t.ms, 0)} ms
           </span>
         </div>
 
@@ -98,11 +100,10 @@ export function PipelineTrace({ pipeline, className = "" }: PipelineTraceProps) 
         <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-4 space-y-2">
           <div className="flex items-center gap-2 text-xs font-semibold text-amber-700 dark:text-amber-400">
             <AlertTriangle className="h-4 w-4" />
-            <span>Unverified Candidates ({unverified.length}) — withheld from clinical view</span>
+            <span> <T>{"Unverified Candidates ("}</T> {unverified.length} <T>{") — withheld from clinical view"}</T> </span>
           </div>
           <p className="text-xs text-muted-foreground">
-            These candidates were suggested by the model but could not be verified against verbatim quotes in your text:
-          </p>
+             <T>{"These candidates were suggested by the model but could not be verified against verbatim quotes in your text:"}</T> </p>
           <div className="divide-y divide-border/60 rounded-lg border border-border/40 bg-background/50">
             {unverified.map((u, i) => (
               <div key={i} className="flex items-center justify-between p-2.5 text-xs">

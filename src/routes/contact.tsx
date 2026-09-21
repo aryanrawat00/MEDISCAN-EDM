@@ -1,3 +1,4 @@
+import { T, useI18n } from "@/lib/i18n";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -22,6 +23,7 @@ export const Route = createFileRoute("/contact")({
 });
 
 function Contact() {
+  const { t } = useI18n();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
@@ -34,17 +36,16 @@ function Contact() {
     await new Promise((r) => setTimeout(r, 600));
     setSending(false);
     setName(""); setEmail(""); setMessage("");
-    toast.success("Thanks! We'll get back to you soon.");
+    toast.success(t("Thanks! We'll get back to you soon."));
   };
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-16 sm:px-6">
       <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
-        Let's <span className="brand-text-gradient">talk</span>.
+         <T>{"Let's"}</T> <span className="brand-text-gradient"> <T>{"talk"}</T> </span>.
       </h1>
       <p className="mt-4 max-w-2xl text-lg text-muted-foreground">
-        Feedback, feature ideas, partnership questions — drop us a note.
-      </p>
+         <T>{"Feedback, feature ideas, partnership questions — drop us a note."}</T> </p>
 
       <div className="mt-10 grid gap-6 lg:grid-cols-[1fr_320px]">
         <form
@@ -53,7 +54,7 @@ function Contact() {
         >
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <Label htmlFor="name">Name</Label>
+              <Label htmlFor="name"> <T>{"Name"}</T> </Label>
               <input
                 id="name"
                 required
@@ -63,7 +64,7 @@ function Contact() {
               />
             </div>
             <div>
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email"> <T>{"Email"}</T> </Label>
               <input
                 id="email"
                 type="email"
@@ -75,14 +76,14 @@ function Contact() {
             </div>
           </div>
           <div>
-            <Label htmlFor="message">Message</Label>
+            <Label htmlFor="message"> <T>{"Message"}</T> </Label>
             <Textarea
               id="message"
               required
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               className="mt-1 min-h-[180px]"
-              placeholder="How can we help?"
+              placeholder={t("How can we help?")}
             />
           </div>
           <Button type="submit" disabled={sending} className="brand-gradient text-white">
@@ -91,15 +92,14 @@ function Contact() {
         </form>
 
         <aside className="space-y-4">
-          <Item icon={<Mail className="h-5 w-5" />} title="Email">
+          <Item icon={<Mail className="h-5 w-5" />} title={t("Email")}>
             hello@mediscan.ai
           </Item>
-          <Item icon={<MessageSquare className="h-5 w-5" />} title="Support">
+          <Item icon={<MessageSquare className="h-5 w-5" />} title={t("Support")}>
             support@mediscan.ai
           </Item>
-          <Item icon={<Github className="h-5 w-5" />} title="Open source">
-            File an issue on GitHub
-          </Item>
+          <Item icon={<Github className="h-5 w-5" />} title={t("Open source")}>
+             <T>{"File an issue on GitHub"}</T> </Item>
         </aside>
       </div>
     </div>

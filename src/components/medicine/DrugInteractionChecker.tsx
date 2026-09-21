@@ -1,3 +1,4 @@
+import { T, useI18n } from "@/lib/i18n";
 /**
  * src/components/medicine/DrugInteractionChecker.tsx
  * M07: Deterministic Drug Interaction Checker Component.
@@ -43,6 +44,7 @@ export function DrugInteractionChecker({
   onMedicinesCountChange,
   className = "",
 }: DrugInteractionCheckerProps) {
+  const { t } = useI18n();
   const [selectedMedicines, setSelectedMedicines] = useState<string[]>(initialMedicines);
   const [searchInput, setSearchInput] = useState("");
   const [result, setResult] = useState<InteractionCheckResult | null>(null);
@@ -97,12 +99,12 @@ export function DrugInteractionChecker({
     setSelectedMedicines([]);
     setResult(null);
     setSearchInput("");
-    toast.info("Cleared all selected medicines.");
+    toast.info(t("Cleared all selected medicines."));
   };
 
   const handleRunCheck = () => {
     if (selectedMedicines.length < 2) {
-      toast.error("Please select at least 2 medicines to check for interactions.");
+      toast.error(t("Please select at least 2 medicines to check for interactions."));
       return;
     }
 
@@ -114,7 +116,7 @@ export function DrugInteractionChecker({
         `Found ${checkResult.summary.knownCount} verified interaction(s) across evaluated pairs.`,
       );
     } else {
-      toast.info("No verified interactions found in the current MediScan reference set.");
+      toast.info(t("No verified interactions found in the current MediScan reference set."));
     }
   };
 
@@ -129,7 +131,7 @@ export function DrugInteractionChecker({
   return (
     <section
       id="drug-interaction-checker"
-      className={`rounded-2xl border border-border bg-card p-6 shadow-sm space-y-6 ${className}`}
+      className={`scroll-mt-24 rounded-2xl border border-border bg-card p-6 shadow-sm space-y-6 ${className}`}
     >
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border/80 pb-4">
@@ -140,15 +142,11 @@ export function DrugInteractionChecker({
           <div>
             <div className="flex items-center gap-2">
               <h2 className="font-bold text-lg text-foreground tracking-tight">
-                Drug Interaction Checker
-              </h2>
-              <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">
-                Deterministic Engine
-              </span>
+                 <T>{"Drug Interaction Checker"}</T> </h2>
+
             </div>
             <p className="text-xs text-muted-foreground mt-0.5">
-              Evaluate combinations against verified openFDA monograph labeling · Zero AI guessing
-            </p>
+               <T>{"Check your medicines against the available reference set."}</T> </p>
           </div>
         </div>
 
@@ -159,8 +157,7 @@ export function DrugInteractionChecker({
             onClick={handleClearAll}
             className="h-8 text-xs text-muted-foreground hover:text-foreground"
           >
-            <RotateCcw className="mr-1.5 h-3.5 w-3.5" /> Clear List
-          </Button>
+            <RotateCcw className="mr-1.5 h-3.5 w-3.5" />  <T>{"Clear List"}</T> </Button>
         )}
       </div>
 
@@ -168,11 +165,11 @@ export function DrugInteractionChecker({
       <div className="space-y-3">
         <div className="flex items-center justify-between text-xs">
           <span className="font-semibold text-foreground uppercase tracking-wider">
-            Selected Medicines ({selectedMedicines.length} / {MAX_INTERACTION_MEDICINES})
+             <T>{"Selected Medicines ("}</T> {selectedMedicines.length} / {MAX_INTERACTION_MEDICINES})
           </span>
           <span className="text-muted-foreground">
             {selectedMedicines.length < 2
-              ? "Select at least 2 to evaluate"
+              ? t("Select at least 2 to evaluate")
               : `${(selectedMedicines.length * (selectedMedicines.length - 1)) / 2} pair(s) to evaluate`}
           </span>
         </div>
@@ -180,10 +177,9 @@ export function DrugInteractionChecker({
         {selectedMedicines.length === 0 ? (
           <div className="rounded-xl border border-dashed border-border/80 bg-muted/20 p-6 text-center text-xs text-muted-foreground">
             <Pill className="h-6 w-6 mx-auto mb-2 text-muted-foreground/60" />
-            <p className="font-medium text-foreground">No medicines selected yet</p>
+            <p className="font-medium text-foreground"> <T>{"No medicines selected yet"}</T> </p>
             <p className="mt-1">
-              Add medicines using the search box below, select from quick tags, or click "Add to Interaction Check" from any scanned medicine.
-            </p>
+               <T>{"Add medicines using the search box below, select from quick tags, or click \"Add to Interaction Check\" from any scanned medicine."}</T> </p>
           </div>
         ) : (
           <div className="flex flex-wrap gap-2">
@@ -214,7 +210,7 @@ export function DrugInteractionChecker({
         <div className="flex gap-2">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
+            <Input aria-label={t("Medicine name")}
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
               onKeyDown={(e) => {
@@ -223,7 +219,7 @@ export function DrugInteractionChecker({
                   handleAddMedicine(searchInput);
                 }
               }}
-              placeholder="Type medicine name or brand (e.g. Aspirin, Ibuprofen, Tylenol, Omeprazole)..."
+              placeholder={t("Type medicine name or brand (e.g. Aspirin, Ibuprofen, Tylenol, Omeprazole)...")}
               disabled={selectedMedicines.length >= MAX_INTERACTION_MEDICINES}
               className="pl-9 text-xs sm:text-sm"
             />
@@ -236,14 +232,13 @@ export function DrugInteractionChecker({
             disabled={!searchInput.trim() || selectedMedicines.length >= MAX_INTERACTION_MEDICINES}
             className="text-xs"
           >
-            <Plus className="mr-1 h-3.5 w-3.5" /> Add
-          </Button>
+            <Plus className="mr-1 h-3.5 w-3.5" />  <T>{"Add"}</T> </Button>
         </div>
 
         {/* Quick Suggestion Chips */}
         {availableQuickPicks.length > 0 && selectedMedicines.length < MAX_INTERACTION_MEDICINES && (
           <div className="flex flex-wrap items-center gap-1.5 text-xs">
-            <span className="text-muted-foreground text-[11px] mr-1">Quick Add:</span>
+            <span className="text-muted-foreground text-[11px] mr-1"> <T>{"Quick Add:"}</T> </span>
             {availableQuickPicks.slice(0, 6).map((m) => (
               <button
                 key={m.key}
@@ -267,8 +262,8 @@ export function DrugInteractionChecker({
             className="w-full sm:w-auto brand-gradient text-white shadow-sm font-semibold text-xs sm:text-sm px-6 h-10"
           >
             <ArrowRightLeft className="mr-2 h-4 w-4" />
-            Check Interactions ({selectedMedicines.length}{" "}
-            {selectedMedicines.length === 1 ? "medicine" : "medicines"})
+             <T>{"Check Interactions ("}</T> {selectedMedicines.length}{" "}
+            {selectedMedicines.length === 1 ? t("medicine") : t("medicines")})
           </Button>
         </div>
       </div>
@@ -281,12 +276,10 @@ export function DrugInteractionChecker({
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div className="space-y-1">
                 <h3 className="font-bold text-sm text-foreground">
-                  Interaction Check Evaluation
-                </h3>
+                   <T>{"Interaction Check Evaluation"}</T> </h3>
                 <p className="text-xs text-muted-foreground">
-                  {result.totalMedicines} medicines evaluated · {result.totalPairs} unique medicine{" "}
-                  {result.totalPairs === 1 ? "pair" : "pairs"} analyzed
-                </p>
+                  {result.totalMedicines}  <T>{"medicines evaluated ·"}</T> {result.totalPairs}  <T>{"unique medicine"}</T> {" "}
+                  {result.totalPairs === 1 ? t("pair") : t("pairs")}  <T>{"analyzed"}</T> </p>
               </div>
 
               {/* Status Metrics */}
@@ -294,19 +287,16 @@ export function DrugInteractionChecker({
                 {result.summary.majorCount > 0 && (
                   <span className="inline-flex items-center gap-1 rounded-md bg-rose-500/10 px-2.5 py-1 text-xs font-bold text-rose-600 dark:text-rose-400 border border-rose-500/20">
                     <ShieldAlert className="h-3.5 w-3.5" />
-                    {result.summary.majorCount} Major
-                  </span>
+                    {result.summary.majorCount}  <T>{"Major"}</T> </span>
                 )}
                 {result.summary.moderateCount > 0 && (
                   <span className="inline-flex items-center gap-1 rounded-md bg-amber-500/10 px-2.5 py-1 text-xs font-bold text-amber-700 dark:text-amber-400 border border-amber-500/20">
                     <AlertTriangle className="h-3.5 w-3.5" />
-                    {result.summary.moderateCount} Moderate
-                  </span>
+                    {result.summary.moderateCount}  <T>{"Moderate"}</T> </span>
                 )}
                 <span className="inline-flex items-center gap-1 rounded-md bg-slate-500/10 px-2.5 py-1 text-xs font-medium text-slate-600 dark:text-slate-400 border border-slate-500/20">
                   <Info className="h-3.5 w-3.5" />
-                  {result.summary.notFoundCount} Not in reference set
-                </span>
+                  {result.summary.notFoundCount}  <T>{"Not in reference set"}</T> </span>
               </div>
             </div>
           </div>
@@ -351,13 +341,13 @@ export function DrugInteractionChecker({
                         <AlertTriangle className="h-3.5 w-3.5" />
                       )}
                       <span>
-                        {pair.severity === "major" ? "Major Interaction" : "Moderate Interaction"}
+                        {pair.severity === "major" ? t("Major Interaction") : t("Moderate Interaction")}
                       </span>
                     </span>
                   ) : (
                     <span className="inline-flex items-center gap-1.5 rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium text-muted-foreground border border-border">
                       <Info className="h-3.5 w-3.5" />
-                      <span>No verified interaction found</span>
+                      <span> <T>{"No verified interaction found"}</T> </span>
                     </span>
                   )}
                 </div>
@@ -367,23 +357,20 @@ export function DrugInteractionChecker({
                   {pair.category && (
                     <div>
                       <span className="font-semibold text-muted-foreground uppercase text-[10px] tracking-wider">
-                        Clinical Category:
-                      </span>
+                         <T>{"Clinical Category:"}</T> </span>
                       <p className="font-medium text-foreground mt-0.5">{pair.category}</p>
                     </div>
                   )}
 
                   <div>
                     <span className="font-semibold text-muted-foreground uppercase text-[10px] tracking-wider">
-                      Reference Explanation:
-                    </span>
+                       <T>{"Reference Explanation:"}</T> </span>
                     <p className="text-foreground mt-0.5">{pair.description}</p>
                   </div>
 
                   <div>
                     <span className="font-semibold text-muted-foreground uppercase text-[10px] tracking-wider">
-                      Why It Matters:
-                    </span>
+                       <T>{"Why It Matters:"}</T> </span>
                     <p className="text-muted-foreground mt-0.5">{pair.whyItMatters}</p>
                   </div>
 
@@ -391,14 +378,14 @@ export function DrugInteractionChecker({
                     <div className="rounded-lg border border-border/80 bg-muted/30 p-3">
                       <div className="flex items-center gap-1 font-semibold text-foreground text-[11px] mb-1">
                         <FileCheck className="h-3.5 w-3.5 text-primary" />
-                        <span>Supporting Monograph Evidence</span>
+                        <span> <T>{"Supporting Monograph Evidence"}</T> </span>
                       </div>
                       <blockquote className="italic text-muted-foreground font-mono text-[11px]">
                         "{pair.evidence}"
                       </blockquote>
                       {pair.source && (
                         <p className="text-[10px] text-muted-foreground/80 mt-1.5 font-sans">
-                          Source: {pair.source}
+                           <T>{"Source:"}</T> {pair.source}
                         </p>
                       )}
                     </div>
@@ -423,7 +410,7 @@ export function DrugInteractionChecker({
           <div className="rounded-xl border border-border/60 bg-muted/20 p-4 text-[11px] text-muted-foreground space-y-1">
             <div className="flex items-center gap-1.5 font-semibold text-foreground">
               <BookOpen className="h-3.5 w-3.5 text-primary" />
-              <span>Evidence-First Reference Notice</span>
+              <span> <T>{"Evidence-First Reference Notice"}</T> </span>
             </div>
             <p>{result.disclaimer}</p>
           </div>

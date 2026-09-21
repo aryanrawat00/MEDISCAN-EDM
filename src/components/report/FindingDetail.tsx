@@ -1,3 +1,4 @@
+import { T, useI18n } from "@/lib/i18n";
 /**
  * src/components/report/FindingDetail.tsx
  * T16: Detailed Evidence Audit Inspector (Blueprint §18).
@@ -15,11 +16,11 @@ interface FindingDetailProps {
 }
 
 export function FindingDetail({ finding, className = "" }: FindingDetailProps) {
+  const { t } = useI18n();
   if (!finding) {
     return (
       <div className={`rounded-xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground ${className}`}>
-        Select any row from the findings table to inspect its evidence lock and rule trace.
-      </div>
+         <T>{"Select any row from the findings table to inspect its evidence lock and rule trace."}</T> </div>
     );
   }
 
@@ -37,9 +38,9 @@ export function FindingDetail({ finding, className = "" }: FindingDetailProps) {
             <span className="text-xs font-mono text-muted-foreground">[{finding.id}]</span>
           </div>
           <p className="mt-0.5 text-xs text-muted-foreground">
-            Measured: <strong className="text-foreground">{finding.valueText} {finding.unit ?? ""}</strong>
+             <T>{"Measured:"}</T> <strong className="text-foreground">{finding.valueText} {finding.unit ?? ""}</strong>
             {finding.referenceRangeText && (
-              <> · Printed Range: <strong className="text-foreground">{finding.referenceRangeText}</strong></>
+              <>  <T>{"· Printed Range:"}</T> <strong className="text-foreground">{finding.referenceRangeText}</strong></>
             )}
           </p>
         </div>
@@ -51,7 +52,7 @@ export function FindingDetail({ finding, className = "" }: FindingDetailProps) {
       <div className="space-y-1.5">
         <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
           <Quote className="h-3.5 w-3.5 text-primary" />
-          <span>Verbatim Evidence Quote from Source:</span>
+          <span> <T>{"Verbatim Evidence Quote from Source:"}</T> </span>
         </div>
         <blockquote className="rounded-lg bg-muted/40 p-3 font-mono text-xs text-foreground border-l-2 border-primary leading-relaxed">
           "{evidence.quote}"
@@ -62,14 +63,14 @@ export function FindingDetail({ finding, className = "" }: FindingDetailProps) {
       <div className="space-y-2 rounded-lg bg-muted/20 p-3.5 border border-border/40">
         <div className="flex items-center gap-1.5 text-xs font-semibold uppercase text-muted-foreground">
           <ShieldCheck className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-          <span>Evidence-Lock Verification Checks</span>
+          <span> <T>{"Evidence-Lock Verification Checks"}</T> </span>
         </div>
 
         <div className="grid grid-cols-2 gap-2 text-xs pt-1">
-          <CheckItem label="Quote In Source" passed={evidence.checks.quoteFound} />
-          <CheckItem label="Test Name In Quote" passed={evidence.checks.nameInQuote} />
-          <CheckItem label="Value In Quote (Standalone)" passed={evidence.checks.valueInQuote} />
-          <CheckItem label="Range In Quote" passed={evidence.checks.rangeInQuote} />
+          <CheckItem label={t("Quote In Source")} passed={evidence.checks.quoteFound} />
+          <CheckItem label={t("Test Name In Quote")} passed={evidence.checks.nameInQuote} />
+          <CheckItem label={t("Value In Quote (Standalone)")} passed={evidence.checks.valueInQuote} />
+          <CheckItem label={t("Range In Quote")} passed={evidence.checks.rangeInQuote} />
         </div>
       </div>
 
@@ -77,7 +78,7 @@ export function FindingDetail({ finding, className = "" }: FindingDetailProps) {
       {finding.labFlag && (
         <div className="flex items-center justify-between rounded-lg bg-muted/30 p-2.5 text-xs">
           <span className="text-muted-foreground">
-            Report Printed Flag: <strong>{finding.labFlag}</strong>
+             <T>{"Report Printed Flag:"}</T> <strong>{finding.labFlag}</strong>
           </span>
           <span
             className={`font-semibold ${
@@ -86,7 +87,7 @@ export function FindingDetail({ finding, className = "" }: FindingDetailProps) {
                 : "text-amber-600 dark:text-amber-400"
             }`}
           >
-            {finding.labFlagAgreement === "AGREES" ? "✓ Agrees with Range" : "⚠ Disagrees with Range"}
+            {finding.labFlagAgreement === "AGREES" ? t("✓ Agrees with Range") : t("⚠ Disagrees with Range")}
           </span>
         </div>
       )}
@@ -96,7 +97,7 @@ export function FindingDetail({ finding, className = "" }: FindingDetailProps) {
         <div className="space-y-1.5">
           <div className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground">
             <Terminal className="h-3.5 w-3.5" />
-            <span>Deterministic Rule Trace:</span>
+            <span> <T>{"Deterministic Rule Trace:"}</T> </span>
           </div>
           <div className="rounded-lg bg-slate-950 p-3 font-mono text-[11px] text-slate-300 space-y-1">
             {finding.ruleTrace.map((step, idx) => (

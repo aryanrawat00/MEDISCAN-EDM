@@ -1,3 +1,4 @@
+import { T, useI18n } from "@/lib/i18n";
 /**
  * src/routes/demo.tsx
  * T22: Offline Demo Mode (Blueprint §22).
@@ -45,6 +46,7 @@ type DemoDomain = "reports" | "medicines";
 type ReportSubTab = "findings" | "brief" | "trace" | "lab";
 
 function DemoPage() {
+  const { t } = useI18n();
   const [domain, setDomain] = useState<DemoDomain>("reports");
   const [selectedSampleIndex, setSelectedSampleIndex] = useState<number>(0);
   const [reportSubTab, setReportSubTab] = useState<ReportSubTab>("findings");
@@ -75,26 +77,25 @@ function DemoPage() {
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
       {/* Onboarding Guide */}
       {showGuide && (
-        <div className="mb-6 rounded-xl border border-amber-500/30 bg-amber-500/5 p-4 relative" role="region" aria-label="Demo guide">
+        <div className="mb-6 rounded-xl border border-amber-500/30 bg-amber-500/5 p-4 relative" role="region" aria-label={t("Demo guide")}>
           <button
             onClick={() => setShowGuide(false)}
             className="absolute top-2 right-2 rounded-md p-1 text-muted-foreground hover:text-foreground"
-            aria-label="Dismiss guide"
+            aria-label={t("Dismiss guide")}
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
           </button>
           <div className="flex items-start gap-3">
             <Sparkles className="h-5 w-5 text-amber-500 shrink-0 mt-0.5" />
             <div className="text-sm">
-              <p className="font-semibold text-foreground">Welcome to the Demo Lab!</p>
+              <p className="font-semibold text-foreground"> <T>{"Welcome to the Demo Lab!"}</T> </p>
               <p className="mt-1 text-muted-foreground leading-relaxed">
-                This demo runs <strong>entirely offline</strong> in your browser. Try these steps:
-              </p>
+                 <T>{"This demo runs"}</T> <strong> <T>{"entirely offline"}</T> </strong>  <T>{"in your browser. Try these steps:"}</T> </p>
               <ol className="mt-2 list-decimal list-inside space-y-1 text-muted-foreground text-xs">
-                <li>Switch between <strong>Report Intelligence</strong> and <strong>Medicine Lens</strong> using the toggle above</li>
-                <li>Select different sample cases to see how the deterministic engine analyzes each one</li>
-                <li>Explore the <strong>Findings</strong>, <strong>Doctor Brief</strong>, <strong>Audit Trail</strong>, and <strong>Verification Lab</strong> tabs</li>
-                <li>Click any finding row to see its detailed evidence, verbatim quotes, and rule trace</li>
+                <li> <T>{"Switch between"}</T> <strong> <T>{"Report Intelligence"}</T> </strong>  <T>{"and"}</T> <strong> <T>{"Medicine Lens"}</T> </strong>  <T>{"using the toggle above"}</T> </li>
+                <li> <T>{"Select different sample cases to see how the deterministic engine analyzes each one"}</T> </li>
+                <li> <T>{"Explore the"}</T> <strong> <T>{"Findings"}</T> </strong>, <strong> <T>{"Doctor Brief"}</T> </strong>, <strong> <T>{"Audit Trail"}</T> </strong> <T>{", and"}</T> <strong> <T>{"Verification Lab"}</T> </strong>  <T>{"tabs"}</T> </li>
+                <li> <T>{"Click any finding row to see its detailed evidence, verbatim quotes, and rule trace"}</T> </li>
               </ol>
             </div>
           </div>
@@ -105,14 +106,12 @@ function DemoPage() {
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border pb-6">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold tracking-tight">Interactive Demo Mode</h1>
+            <h1 className="text-2xl font-bold tracking-tight"> <T>{"Interactive Demo Mode"}</T> </h1>
             <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
-              <ShieldCheck className="h-3.5 w-3.5" /> 100% Offline & Client-Side
-            </span>
+              <ShieldCheck className="h-3.5 w-3.5" />  <T>{"100% Offline & Client-Side"}</T> </span>
           </div>
           <p className="mt-1 text-sm text-muted-foreground">
-            Explore verified clinical sample analyses with zero setup, zero authentication, and zero network calls.
-          </p>
+             <T>{"Explore verified clinical sample analyses with zero setup, zero authentication, and zero network calls."}</T> </p>
         </div>
 
         {/* Domain Switcher */}
@@ -126,8 +125,7 @@ function DemoPage() {
                 : "text-muted-foreground hover:text-foreground"
             }`}
           >
-            <FileText className="h-3.5 w-3.5" /> Report Intelligence
-          </button>
+            <FileText className="h-3.5 w-3.5" />  <T>{"Report Intelligence"}</T> </button>
           <button
             type="button"
             onClick={() => setDomain("medicines")}
@@ -137,8 +135,7 @@ function DemoPage() {
                 : "text-muted-foreground hover:text-foreground"
             }`}
           >
-            <Pill className="h-3.5 w-3.5" /> Medicine Lens
-          </button>
+            <Pill className="h-3.5 w-3.5" />  <T>{"Medicine Lens"}</T> </button>
         </div>
       </div>
 
@@ -150,8 +147,7 @@ function DemoPage() {
           {/* Sample Picker Strip */}
           <div className="space-y-2">
             <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              Select Pre-Verified Clinical Sample
-            </span>
+               <T>{"Select Pre-Verified Clinical Sample"}</T> </span>
             <div className="grid gap-3 sm:grid-cols-3">
               {REPORT_SAMPLES.map((s, idx) => {
                 const isSelected = selectedSampleIndex === idx;
@@ -171,11 +167,10 @@ function DemoPage() {
                   >
                     <div className="flex items-center justify-between">
                       <span className="text-xs font-semibold uppercase text-primary">
-                        Sample 0{idx + 1}
+                         <T>{"Sample 0"}</T> {idx + 1}
                       </span>
                       <span className="text-[11px] text-muted-foreground">
-                        {s.cachedRawFindings.length} findings
-                      </span>
+                        {s.cachedRawFindings.length}  <T>{"findings"}</T> </span>
                     </div>
                     <p className="mt-1 font-semibold text-sm text-foreground">{s.title}</p>
                     <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">
@@ -193,23 +188,21 @@ function DemoPage() {
               <div className="flex items-center gap-2">
                 <h2 className="font-semibold text-foreground">{sample.title}</h2>
                 <span className="rounded bg-emerald-500/10 px-2 py-0.5 text-xs font-medium text-emerald-600 dark:text-emerald-400">
-                  Evidence Locked
-                </span>
+                   <T>{"Evidence Locked"}</T> </span>
               </div>
               <p className="mt-0.5 text-xs text-muted-foreground">
-                {pipelineResult.findings.length} verified findings · {pipelineResult.stats.verified} quote matches · Deterministic rule evaluation
-              </p>
+                {pipelineResult.findings.length}  <T>{"verified findings ·"}</T> {pipelineResult.stats.verified}  <T>{"quote matches · Deterministic rule evaluation"}</T> </p>
             </div>
 
             <div className="flex items-center gap-4 text-xs font-medium">
               <div className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400">
                 <ShieldCheck className="h-4 w-4" />
-                <span>{pipelineResult.stats.verified} Verified</span>
+                <span>{pipelineResult.stats.verified}  <T>{"Verified"}</T> </span>
               </div>
               {pipelineResult.stats.flagged > 0 && (
                 <div className="flex items-center gap-1.5 text-rose-500">
                   <AlertTriangle className="h-4 w-4" />
-                  <span>{pipelineResult.stats.flagged} Flagged Abnormal</span>
+                  <span>{pipelineResult.stats.flagged}  <T>{"Flagged Abnormal"}</T> </span>
                 </div>
               )}
             </div>
@@ -226,7 +219,7 @@ function DemoPage() {
                   : "text-muted-foreground hover:bg-muted hover:text-foreground"
               }`}
             >
-              <Layers className="h-3.5 w-3.5" /> Findings & Evidence ({pipelineResult.findings.length})
+              <Layers className="h-3.5 w-3.5" />  <T>{"Findings & Evidence ("}</T> {pipelineResult.findings.length})
             </button>
             <button
               type="button"
@@ -237,8 +230,7 @@ function DemoPage() {
                   : "text-muted-foreground hover:bg-muted hover:text-foreground"
               }`}
             >
-              <FileCheck className="h-3.5 w-3.5" /> Doctor Visit Brief
-            </button>
+              <FileCheck className="h-3.5 w-3.5" />  <T>{"Doctor Visit Brief"}</T> </button>
             <button
               type="button"
               onClick={() => setReportSubTab("trace")}
@@ -248,8 +240,7 @@ function DemoPage() {
                   : "text-muted-foreground hover:bg-muted hover:text-foreground"
               }`}
             >
-              <Activity className="h-3.5 w-3.5" /> Pipeline Telemetry
-            </button>
+              <Activity className="h-3.5 w-3.5" />  <T>{"Pipeline Telemetry"}</T> </button>
             <button
               type="button"
               onClick={() => setReportSubTab("lab")}
@@ -259,8 +250,7 @@ function DemoPage() {
                   : "text-muted-foreground hover:bg-muted hover:text-foreground"
               }`}
             >
-              <FlaskConical className="h-3.5 w-3.5" /> Tamper Lab
-            </button>
+              <FlaskConical className="h-3.5 w-3.5" />  <T>{"Tamper Lab"}</T> </button>
           </div>
 
           {/* SubTab 1: Findings & Evidence */}
@@ -275,15 +265,13 @@ function DemoPage() {
               <div className="grid gap-6 lg:grid-cols-2">
                 <div>
                   <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                    Finding Evidence Audit
-                  </h3>
+                     <T>{"Finding Evidence Audit"}</T> </h3>
                   <FindingDetail finding={selectedFinding} />
                 </div>
 
                 <div>
                   <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                    Source Document Span
-                  </h3>
+                     <T>{"Source Document Span"}</T> </h3>
                   <div className="max-h-[500px] overflow-auto rounded-xl border border-border bg-card p-4 shadow-sm font-mono text-xs">
                     <SourceViewer
                       sourceText={sample.sourceText}
@@ -323,8 +311,7 @@ function DemoPage() {
           {/* Sample Picker Strip */}
           <div className="space-y-2">
             <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              Select Pre-Verified OTC Medicine Sample
-            </span>
+               <T>{"Select Pre-Verified OTC Medicine Sample"}</T> </span>
             <div className="grid gap-3 sm:grid-cols-3">
               {MEDICINE_SAMPLES.map((s, idx) => {
                 const isSelected = selectedMedicineIndex === idx;
@@ -344,8 +331,7 @@ function DemoPage() {
                         {s.category}
                       </span>
                       <span className="inline-flex items-center gap-1 rounded bg-emerald-500/10 px-1.5 py-0.5 text-[10px] font-medium text-emerald-600 dark:text-emerald-400">
-                        <ShieldCheck className="h-3 w-3" /> Verified
-                      </span>
+                        <ShieldCheck className="h-3 w-3" />  <T>{"Verified"}</T> </span>
                     </div>
                     <p className="mt-1 font-semibold text-sm text-foreground">{s.title}</p>
                     <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">
@@ -371,8 +357,7 @@ function DemoPage() {
                   : "text-muted-foreground hover:bg-muted hover:text-foreground"
               }`}
             >
-              <Layers className="h-3.5 w-3.5" /> Verified Ingredients (
-              {medicineSample.precomputedScan.verifiedIngredients.length})
+              <Layers className="h-3.5 w-3.5" />  <T>{"Verified Ingredients ("}</T> {medicineSample.precomputedScan.verifiedIngredients.length})
             </button>
             <button
               type="button"
@@ -383,8 +368,7 @@ function DemoPage() {
                   : "text-muted-foreground hover:bg-muted hover:text-foreground"
               }`}
             >
-              <Bookmark className="h-3.5 w-3.5" /> Official Monograph (
-              {medicineSample.precomputedScan.monographs.length})
+              <Bookmark className="h-3.5 w-3.5" />  <T>{"Official Monograph ("}</T> {medicineSample.precomputedScan.monographs.length})
             </button>
             <button
               type="button"
@@ -395,8 +379,7 @@ function DemoPage() {
                   : "text-muted-foreground hover:bg-muted hover:text-foreground"
               }`}
             >
-              <FileText className="h-3.5 w-3.5" /> Packaging OCR Evidence
-            </button>
+              <FileText className="h-3.5 w-3.5" />  <T>{"Packaging OCR Evidence"}</T> </button>
           </div>
 
           {/* SubTab 1: Ingredients */}
@@ -409,8 +392,7 @@ function DemoPage() {
               {medicineSample.precomputedScan.safetyWarnings.length > 0 && (
                 <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-4 space-y-2">
                   <h4 className="text-xs font-semibold text-amber-700 dark:text-amber-400 uppercase tracking-wider">
-                    Important Safety Warnings from Official FDA Drug Label
-                  </h4>
+                     <T>{"Important Safety Warnings from Official FDA Drug Label"}</T> </h4>
                   <ul className="list-disc pl-5 text-xs text-muted-foreground space-y-1">
                     {medicineSample.precomputedScan.safetyWarnings.map((w, i) => (
                       <li key={i}>{w}</li>

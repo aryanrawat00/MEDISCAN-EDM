@@ -1,3 +1,5 @@
+import { T, useI18n } from "@/lib/i18n";
+import * as DialogPrimitive from "@radix-ui/react-dialog";
 /**
  * src/components/report/ShareVerifiedSummaryModal.tsx
  * Shareable Verified Summary Modal.
@@ -45,6 +47,7 @@ export function ShareVerifiedSummaryModal({
   evidenceFingerprint,
   findingsWithEvidence,
 }: ShareVerifiedSummaryModalProps) {
+  const { t } = useI18n();
   if (!isOpen) return null;
 
   const summaryText = generateShareableVerifiedSummary(brief, {
@@ -57,9 +60,9 @@ export function ShareVerifiedSummaryModal({
   const handleCopy = async () => {
     const success = await copySummaryToClipboard(summaryText);
     if (success) {
-      toast.success("Verified summary copied to clipboard.");
+      toast.success(t("Verified summary copied to clipboard."));
     } else {
-      toast.error("Failed to copy summary.");
+      toast.error(t("Failed to copy summary."));
     }
   };
 
@@ -77,18 +80,12 @@ export function ShareVerifiedSummaryModal({
   };
 
   return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="share-verified-summary-title"
-      className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 p-4 backdrop-blur-xs animate-in fade-in"
-    >
-      <div className="relative w-full max-w-2xl rounded-2xl border border-border bg-card p-6 shadow-xl sm:p-7 space-y-5 max-h-[90vh] flex flex-col">
+    <DialogPrimitive.Root open={isOpen} onOpenChange={open => { if (!open) onClose(); }}><DialogPrimitive.Portal><DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-slate-950/35 backdrop-blur-xs" /><DialogPrimitive.Content aria-describedby={undefined} className="fixed left-1/2 top-1/2 z-50 max-h-[90dvh] w-[calc(100%-2rem)] max-w-2xl -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-2xl border border-border bg-card p-6 shadow-xl sm:p-7 space-y-5" onCloseAutoFocus={event => { event.preventDefault(); }}>
         {/* Close Button */}
         <button
           type="button"
           onClick={onClose}
-          aria-label="Close Share Summary"
+          aria-label={t("Close Share Summary")}
           className="absolute right-4 top-4 rounded-lg p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
         >
           <X className="h-5 w-5" />
@@ -101,16 +98,14 @@ export function ShareVerifiedSummaryModal({
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h2 id="share-verified-summary-title" className="text-lg font-bold tracking-tight text-foreground">
-                Share Verified Summary
-              </h2>
+              <DialogPrimitive.Title id="share-verified-summary-title" className="text-lg font-bold tracking-tight text-foreground">
+                 <T>{"Share Verified Summary"}</T> </DialogPrimitive.Title>
               <span className="rounded-md bg-emerald-500/10 px-2 py-0.5 font-mono text-[11px] font-semibold text-emerald-600 dark:text-emerald-400">
                 {verificationId}
               </span>
             </div>
             <p className="text-xs text-muted-foreground mt-0.5">
-              Evidence-locked summary ready for clinical appointment discussion or printing.
-            </p>
+               <T>{"Evidence-locked summary ready for clinical appointment discussion or printing."}</T> </p>
           </div>
         </div>
 
@@ -120,18 +115,17 @@ export function ShareVerifiedSummaryModal({
             <ShieldCheck className="h-4 w-4 text-emerald-600 shrink-0" />
             <div>
               <p className="font-semibold text-foreground">
-                Verification ID: <span className="font-mono text-primary">{verificationId}</span>
+                 <T>{"Verification ID:"}</T> <span className="font-mono text-primary">{verificationId}</span>
               </p>
               {evidenceFingerprint && (
                 <p className="font-mono text-[10px] text-muted-foreground mt-0.5">
-                  Integrity Fingerprint: {evidenceFingerprint}
+                   <T>{"Integrity Fingerprint:"}</T> {evidenceFingerprint}
                 </p>
               )}
             </div>
           </div>
           <span className="text-[11px] text-muted-foreground">
-            {brief.overview.counts.verified} Verified findings · Zero PII
-          </span>
+            {brief.overview.counts.verified}  <T>{"Verified findings · Zero PII"}</T> </span>
         </div>
 
         {/* Plain Text Preview Container */}
@@ -142,8 +136,7 @@ export function ShareVerifiedSummaryModal({
         {/* Actions Toolbar */}
         <div className="border-t border-border pt-4 flex flex-wrap items-center justify-between gap-2 shrink-0">
           <Button type="button" variant="ghost" size="sm" onClick={onClose} className="h-9 text-xs">
-            Close
-          </Button>
+             <T>{"Close"}</T> </Button>
 
           <div className="flex flex-wrap items-center gap-2">
             <Button
@@ -153,8 +146,7 @@ export function ShareVerifiedSummaryModal({
               onClick={handleCopy}
               className="h-9 text-xs"
             >
-              <Copy className="mr-1.5 h-3.5 w-3.5" /> Copy Summary
-            </Button>
+              <Copy className="mr-1.5 h-3.5 w-3.5" />  <T>{"Copy Summary"}</T> </Button>
             <Button
               type="button"
               variant="outline"
@@ -162,19 +154,16 @@ export function ShareVerifiedSummaryModal({
               onClick={handleDownload}
               className="h-9 text-xs"
             >
-              <Download className="mr-1.5 h-3.5 w-3.5" /> Download (.txt)
-            </Button>
+              <Download className="mr-1.5 h-3.5 w-3.5" />  <T>{"Download (.txt)"}</T> </Button>
             <Button
               type="button"
               size="sm"
               onClick={handlePrint}
               className="h-9 brand-gradient text-white text-xs shadow-xs"
             >
-              <Printer className="mr-1.5 h-3.5 w-3.5" /> Print / Save as PDF
-            </Button>
+              <Printer className="mr-1.5 h-3.5 w-3.5" />  <T>{"Print / Save as PDF"}</T> </Button>
           </div>
         </div>
-      </div>
-    </div>
+</DialogPrimitive.Content></DialogPrimitive.Portal></DialogPrimitive.Root>
   );
 }

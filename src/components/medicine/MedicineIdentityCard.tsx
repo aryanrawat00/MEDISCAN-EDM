@@ -1,3 +1,4 @@
+import { T } from "@/lib/i18n";
 /**
  * src/components/medicine/MedicineIdentityCard.tsx
  * M06: Header card displaying medicine identification status, brand name, and confidence (Blueprint §10).
@@ -36,7 +37,7 @@ export function MedicineIdentityCard({
             </div>
             {dosageForm && (
               <p className="text-xs text-muted-foreground mt-0.5">
-                Dosage form: <span className="font-medium text-foreground">{dosageForm}</span>
+                 <T>{"Dosage form:"}</T> <span className="font-medium text-foreground">{dosageForm}</span>
               </p>
             )}
           </div>
@@ -50,7 +51,7 @@ export function MedicineIdentityCard({
               className="inline-flex items-center gap-1.5 rounded-lg border border-primary/40 bg-primary/5 px-3 py-1.5 text-xs font-semibold text-primary hover:bg-primary/10 transition-colors"
             >
               <Pill className="h-3.5 w-3.5" />
-              <span>Add to Interaction Check</span>
+              <span> <T>{"Add to Interaction Check"}</T> </span>
             </button>
           )}
 
@@ -58,7 +59,7 @@ export function MedicineIdentityCard({
           {monographs.length > 0 && (
             <div className="rounded-lg bg-emerald-500/10 px-3 py-1.5 text-xs font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
               <ShieldCheck className="h-4 w-4" />
-              <span>{monographs.length} Approved openFDA Monograph{monographs.length > 1 ? "s" : ""}</span>
+              <span>{monographs.length}  <T>{"Approved openFDA Monograph"}</T> {monographs.length > 1 ? "s" : ""}</span>
             </div>
           )}
         </div>
@@ -66,8 +67,7 @@ export function MedicineIdentityCard({
 
       <div className="mt-4 rounded-lg bg-muted/40 p-3 text-xs">
         <p className="font-semibold text-muted-foreground uppercase tracking-wider text-[10px]">
-          Identification Verdict
-        </p>
+           <T>{"Identification Verdict"}</T> </p>
         <p className="mt-0.5 text-foreground">{statusReason}</p>
       </div>
     </div>
@@ -79,33 +79,28 @@ function StatusBadge({ status }: { status: IdentificationStatus }) {
     case "IDENTIFIED":
       return (
         <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-xs font-medium text-emerald-600 dark:text-emerald-400">
-          <CheckCircle2 className="h-3.5 w-3.5" /> Identified
-        </span>
+          <CheckCircle2 className="h-3.5 w-3.5" />  <T>{"Identified"}</T> </span>
       );
     case "AMBIGUOUS":
       return (
         <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/10 px-2.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">
-          <AlertTriangle className="h-3.5 w-3.5" /> Ambiguous Match
-        </span>
+          <AlertTriangle className="h-3.5 w-3.5" />  <T>{"Ambiguous Match"}</T> </span>
       );
     case "UNVERIFIED_INGREDIENTS":
       return (
         <span className="inline-flex items-center gap-1 rounded-full bg-destructive/10 px-2.5 py-0.5 text-xs font-medium text-destructive">
-          <XCircle className="h-3.5 w-3.5" /> Unverified Ingredients
-        </span>
+          <XCircle className="h-3.5 w-3.5" />  <T>{"Unverified Ingredients"}</T> </span>
       );
     case "UNREADABLE":
       return (
         <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium text-muted-foreground">
-          <HelpCircle className="h-3.5 w-3.5" /> Unreadable Image
-        </span>
+          <HelpCircle className="h-3.5 w-3.5" />  <T>{"Unreadable Image"}</T> </span>
       );
     case "UNIDENTIFIED":
     default:
       return (
         <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium text-muted-foreground">
-          <HelpCircle className="h-3.5 w-3.5" /> Unidentified
-        </span>
+          <HelpCircle className="h-3.5 w-3.5" />  <T>{"Unidentified"}</T> </span>
       );
   }
 }

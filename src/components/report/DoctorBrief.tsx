@@ -1,3 +1,4 @@
+import { T, useI18n } from "@/lib/i18n";
 /**
  * src/components/report/DoctorBrief.tsx
  * T20: Doctor / Patient Visit Brief Component (Blueprint §14, §20).
@@ -46,6 +47,7 @@ export function DoctorBriefView({
   reportName = "Diagnostic Laboratory Report",
   className = "",
 }: DoctorBriefProps) {
+  const { t } = useI18n();
   const [viewMode, setViewMode] = useState<SummaryViewMode>("doctor");
 
   const handlePrint = () => {
@@ -59,9 +61,9 @@ export function DoctorBriefView({
     });
     const success = await copySummaryToClipboard(summaryText);
     if (success) {
-      toast.success("Summary copied");
+      toast.success(t("Summary copied"));
     } else {
-      toast.error("Failed to copy summary to clipboard.");
+      toast.error(t("Failed to copy summary to clipboard."));
     }
   };
 
@@ -93,24 +95,22 @@ export function DoctorBriefView({
                 MEDISCAN AI
               </span>
               <span className="text-xs font-semibold uppercase tracking-widest text-slate-500 border-l border-slate-300 pl-2">
-                Clinical Consultation Summary
-              </span>
+                 <T>{"Clinical Consultation Summary"}</T> </span>
             </div>
             <h1 className="text-lg font-bold text-slate-800 mt-1">{reportName}</h1>
             <p className="text-xs text-slate-600">
-              Evidence-locked diagnostic summary prepared for medical evaluation
-            </p>
+               <T>{"Report summary prepared for your healthcare appointment."}</T> </p>
           </div>
           <div className="text-right text-xs text-slate-600 space-y-0.5">
             <p className="font-semibold text-slate-900">
-              Date: {new Date(brief.generatedAt).toLocaleDateString()}
+               <T>{"Date:"}</T> {new Date(brief.generatedAt).toLocaleDateString()}
             </p>
             <p>
-              {brief.overview.counts.verified} Verified findings ·{" "}
-              <strong>{brief.overview.counts.flagged} Outside range</strong>
+              {brief.overview.counts.verified}  <T>{"Verified findings ·"}</T> {" "}
+              <strong>{brief.overview.counts.flagged}  <T>{"Outside range"}</T> </strong>
             </p>
             <p className="text-[10px] text-slate-500">
-              Format: {viewMode === "doctor" ? "Doctor Clinical Brief" : "Patient Health Summary"}
+               <T>{"Format:"}</T> {viewMode === "doctor" ? t("Doctor Clinical Brief") : t("Patient Health Summary")}
             </p>
           </div>
         </div>
@@ -123,16 +123,15 @@ export function DoctorBriefView({
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <h2 className="text-xl font-bold tracking-tight text-foreground">
-              {viewMode === "doctor" ? "Doctor Visit Brief" : "Patient Health Summary"}
+              {viewMode === "doctor" ? t("Doctor Visit Brief") : t("Patient Health Summary")}
             </h2>
             <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary">
-              1-Page Export Ready
-            </span>
+               <T>{"1-Page Export Ready"}</T> </span>
           </div>
           <p className="text-xs text-muted-foreground">
             {viewMode === "doctor"
-              ? "Clinical consultation summary with verbatim laboratory evidence and discussion points."
-              : "Plain-language health summary designed for easy patient understanding."}
+              ? t("Clinical consultation summary with verbatim laboratory evidence and discussion points.")
+              : t("Plain-language health summary designed for easy patient understanding.")}
           </p>
         </div>
 
@@ -149,8 +148,7 @@ export function DoctorBriefView({
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
-              <Stethoscope className="h-3.5 w-3.5" /> Doctor Brief
-            </button>
+              <Stethoscope className="h-3.5 w-3.5" />  <T>{"Doctor Brief"}</T> </button>
             <button
               type="button"
               onClick={() => setViewMode("patient")}
@@ -160,8 +158,7 @@ export function DoctorBriefView({
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
-              <User className="h-3.5 w-3.5" /> Patient Summary
-            </button>
+              <User className="h-3.5 w-3.5" />  <T>{"Patient Summary"}</T> </button>
           </div>
 
           <Button
@@ -169,30 +166,27 @@ export function DoctorBriefView({
             size="sm"
             onClick={handleCopyText}
             className="h-8 text-xs"
-            title="Copy clean summary to clipboard"
+            title={t("Copy clean summary to clipboard")}
           >
-            <Copy className="mr-1.5 h-3.5 w-3.5" /> Copy Summary
-          </Button>
+            <Copy className="mr-1.5 h-3.5 w-3.5" />  <T>{"Copy Summary"}</T> </Button>
 
           <Button
             variant="outline"
             size="sm"
             onClick={handleDownload}
             className="h-8 text-xs"
-            title="Download appointment summary as text file"
+            title={t("Download appointment summary as text file")}
           >
-            <Download className="mr-1.5 h-3.5 w-3.5" /> Download (.txt)
-          </Button>
+            <Download className="mr-1.5 h-3.5 w-3.5" />  <T>{"Download (.txt)"}</T> </Button>
 
           <Button
             variant="default"
             size="sm"
             onClick={handlePrint}
             className="h-8 brand-gradient text-white text-xs shadow-xs font-semibold"
-            title="Print or Save as PDF"
+            title={t("Print or Save as PDF")}
           >
-            <Printer className="mr-1.5 h-3.5 w-3.5" /> Print / Save as PDF
-          </Button>
+            <Printer className="mr-1.5 h-3.5 w-3.5" />  <T>{"Print / Save as PDF"}</T> </Button>
         </div>
       </div>
 
@@ -201,35 +195,34 @@ export function DoctorBriefView({
         <div className="rounded-xl border border-rose-500/40 bg-rose-500/10 p-4 text-rose-800 dark:text-rose-300 print:border-rose-600 print:bg-rose-50 print:text-rose-950">
           <div className="flex items-center gap-2 font-bold text-sm">
             <AlertOctagon className="h-5 w-5 text-rose-600" />
-            <span>Critical Laboratory Alert Notice</span>
+            <span> <T>{"Critical Laboratory Alert Notice"}</T> </span>
           </div>
           <p className="mt-1 text-xs leading-relaxed">
-            The reporting laboratory has flagged one or more values as critical or panic. Please contact your treating clinician or seek prompt medical evaluation.
-          </p>
+             <T>{"The reporting laboratory has flagged one or more values as critical or panic. Please contact your treating clinician or seek prompt medical evaluation."}</T> </p>
         </div>
       )}
 
       {/* Report Overview Block */}
       <div className="rounded-xl bg-muted/30 p-4 border border-border/60 print:border-slate-300 print:bg-slate-50 print:p-3">
         <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground print:text-slate-600">
-          {viewMode === "doctor" ? "Clinical Summary Overview" : "What Your Report Shows"}
+          {viewMode === "doctor" ? t("Clinical Summary Overview") : t("What Your Report Shows")}
         </div>
         <p className="mt-1 text-sm font-medium text-foreground leading-relaxed print:text-slate-900">
           {brief.overview.text}
         </p>
         <div className="mt-2.5 flex flex-wrap gap-4 text-xs text-muted-foreground print:text-slate-600">
           <span>
-            Total Findings: <strong className="text-foreground print:text-slate-900">{brief.overview.counts.verified}</strong>
+             <T>{"Total Findings:"}</T> <strong className="text-foreground print:text-slate-900">{brief.overview.counts.verified}</strong>
           </span>
           <span>
-            Outside Range:{" "}
+             <T>{"Outside Range:"}</T> {" "}
             <strong className="text-rose-600 print:text-rose-700">
               {brief.overview.counts.flagged}
             </strong>
           </span>
           {brief.overview.counts.pages && (
             <span>
-              Pages: <strong className="text-foreground print:text-slate-900">{brief.overview.counts.pages}</strong>
+               <T>{"Pages:"}</T> <strong className="text-foreground print:text-slate-900">{brief.overview.counts.pages}</strong>
             </span>
           )}
         </div>
@@ -240,8 +233,8 @@ export function DoctorBriefView({
         <div className="space-y-3">
           <h3 className="text-xs font-bold uppercase text-muted-foreground tracking-wider print:text-slate-700">
             {viewMode === "doctor"
-              ? "Out-of-Range Clinical Highlights"
-              : "Results Outside Laboratory Reference Ranges"}
+              ? t("Out-of-Range Clinical Highlights")
+              : t("Results Outside Laboratory Reference Ranges")}
           </h3>
           <div className="space-y-2">
             {brief.keyFindings.map((kf, i) => (
@@ -259,7 +252,7 @@ export function DoctorBriefView({
         <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/5 p-3 text-xs text-emerald-700 dark:text-emerald-300 print:border-emerald-600 print:bg-emerald-50">
           <div className="flex items-center gap-1.5 font-semibold">
             <CheckCircle2 className="h-4 w-4" />
-            <span>All verified tests fall within normal printed reference intervals.</span>
+            <span> <T>{"All verified tests fall within normal printed reference intervals."}</T> </span>
           </div>
         </div>
       )}
@@ -268,17 +261,17 @@ export function DoctorBriefView({
       {viewMode === "doctor" && brief.flagged.length > 0 && (
         <div className="space-y-3">
           <h3 className="text-xs font-bold uppercase text-muted-foreground tracking-wider print:text-slate-700">
-            Parameters to Discuss ({brief.flagged.length})
+             <T>{"Parameters to Discuss ("}</T> {brief.flagged.length})
           </h3>
           <div className="overflow-x-auto rounded-lg border border-border print:border-slate-300">
             <table className="w-full text-left text-xs print:text-[11px]">
               <thead className="border-b border-border bg-muted/40 font-semibold uppercase text-muted-foreground print:bg-slate-100 print:text-slate-700 print:border-slate-300">
                 <tr>
-                  <th className="py-2.5 px-3">Test</th>
-                  <th className="py-2.5 px-3">Result</th>
-                  <th className="py-2.5 px-3">Reference Range</th>
-                  <th className="py-2.5 px-3">Status</th>
-                  <th className="py-2.5 px-3 print:table-cell">Page</th>
+                  <th className="py-2.5 px-3"> <T>{"Test"}</T> </th>
+                  <th className="py-2.5 px-3"> <T>{"Result"}</T> </th>
+                  <th className="py-2.5 px-3"> <T>{"Reference Range"}</T> </th>
+                  <th className="py-2.5 px-3"> <T>{"Status"}</T> </th>
+                  <th className="py-2.5 px-3 print:table-cell"> <T>{"Page"}</T> </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border print:divide-slate-200">
@@ -309,8 +302,8 @@ export function DoctorBriefView({
       <div className="space-y-3">
         <h3 className="text-xs font-bold uppercase text-muted-foreground tracking-wider print:text-slate-700">
           {viewMode === "doctor"
-            ? "Questions for Clinical Consultation"
-            : "Questions to Ask Your Doctor"}
+            ? t("Questions for Clinical Consultation")
+            : t("Questions to Ask Your Doctor")}
         </h3>
         <ul className="space-y-2 text-xs text-foreground">
           {brief.questions.map((q, idx) => (
@@ -329,8 +322,7 @@ export function DoctorBriefView({
       {brief.couldNotVerify.length > 0 && viewMode === "doctor" && (
         <div className="rounded-lg border border-border/80 bg-muted/20 p-3 text-xs space-y-1 print:border-slate-300">
           <div className="font-semibold text-foreground print:text-slate-800 text-[11px]">
-            Unverified Test Lines (Excluded from Brief for Safety)
-          </div>
+             <T>{"Unverified Test Lines (Excluded from Brief for Safety)"}</T> </div>
           <ul className="list-disc pl-4 text-muted-foreground print:text-slate-600 space-y-0.5">
             {brief.couldNotVerify.map((uv, idx) => (
               <li key={idx}>
@@ -345,12 +337,11 @@ export function DoctorBriefView({
       <div className="border-t border-border/80 pt-4 text-[11px] text-muted-foreground space-y-1 print:border-slate-400 print:text-slate-600 print:pt-3">
         <div className="flex items-center gap-1.5 font-semibold text-foreground print:text-slate-800">
           <ShieldCheck className="h-4 w-4 text-emerald-600 print:text-slate-700" />
-          <span>Evidence-Locked Personal Health Information Assistant (MediScan AI)</span>
+          <span> <T>{"Evidence-Locked Personal Health Information Assistant (MediScan AI)"}</T> </span>
         </div>
         <p className="leading-relaxed">{brief.disclaimer}</p>
         <p className="text-[10px] text-muted-foreground/80 print:text-slate-500">
-          Generated from verified lab document · Pure deterministic extraction · Zero generative hallucinations
-        </p>
+           <T>{"Prepared from your report and its evidence checks."}</T> </p>
       </div>
     </div>
   );

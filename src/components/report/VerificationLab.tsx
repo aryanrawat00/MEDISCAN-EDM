@@ -1,3 +1,4 @@
+import { T, useI18n } from "@/lib/i18n";
 /**
  * src/components/report/VerificationLab.tsx
  * T21: Interactive Verification Lab & Tamper Test component (Blueprint §5, §21, D-5).
@@ -72,6 +73,7 @@ const PRESETS: Preset[] = [
 ];
 
 export function VerificationLab() {
+  const { t } = useI18n();
   const [presetIndex, setPresetIndex] = useState<number>(0);
   const [sourceText, setSourceText] = useState(PRESETS[0].sourceText);
   const [testName, setTestName] = useState(PRESETS[0].testName);
@@ -107,10 +109,9 @@ export function VerificationLab() {
             <FlaskConical className="h-5 w-5" />
           </div>
           <div>
-            <h3 className="font-semibold">Evidence Verification Lab</h3>
+            <h3 className="font-semibold"> <T>{"Evidence Verification Lab"}</T> </h3>
             <p className="text-xs text-muted-foreground">
-              Live in-browser evidence locking and tamper engine (Zero LLM calls).
-            </p>
+               <T>{"Live in-browser evidence locking and tamper engine (Zero LLM calls)."}</T> </p>
           </div>
         </div>
 
@@ -134,8 +135,7 @@ export function VerificationLab() {
         <div className="space-y-3">
           <div>
             <Label htmlFor="lab-source" className="text-xs font-semibold">
-              Source Text (Simulated Original Report)
-            </Label>
+               <T>{"Source Text (Simulated Original Report)"}</T> </Label>
             <Textarea
               id="lab-source"
               value={sourceText}
@@ -148,8 +148,7 @@ export function VerificationLab() {
           <div className="grid grid-cols-3 gap-2">
             <div>
               <Label htmlFor="lab-test" className="text-xs">
-                Test Name
-              </Label>
+                 <T>{"Test Name"}</T> </Label>
               <Input
                 id="lab-test"
                 value={testName}
@@ -159,8 +158,7 @@ export function VerificationLab() {
             </div>
             <div>
               <Label htmlFor="lab-val" className="text-xs">
-                Value
-              </Label>
+                 <T>{"Value"}</T> </Label>
               <Input
                 id="lab-val"
                 value={valueText}
@@ -170,8 +168,7 @@ export function VerificationLab() {
             </div>
             <div>
               <Label htmlFor="lab-unit" className="text-xs">
-                Unit
-              </Label>
+                 <T>{"Unit"}</T> </Label>
               <Input
                 id="lab-unit"
                 value={unit}
@@ -183,8 +180,7 @@ export function VerificationLab() {
 
           <div>
             <Label htmlFor="lab-range" className="text-xs">
-              Reference Range Text
-            </Label>
+               <T>{"Reference Range Text"}</T> </Label>
             <Input
               id="lab-range"
               value={rangeText}
@@ -195,14 +191,13 @@ export function VerificationLab() {
 
           <div>
             <Label htmlFor="lab-quote" className="text-xs font-semibold flex items-center justify-between">
-              <span>Evidence Quote (Candidate substring)</span>
+              <span> <T>{"Evidence Quote (Candidate substring)"}</T> </span>
               <button
                 type="button"
                 onClick={() => setEvidenceQuote(evidenceQuote + " [TAMPERED]")}
                 className="text-[11px] text-destructive hover:underline font-normal"
               >
-                Inject Tamper
-              </button>
+                 <T>{"Inject Tamper"}</T> </button>
             </Label>
             <Textarea
               id="lab-quote"
@@ -218,18 +213,15 @@ export function VerificationLab() {
         <div className="space-y-4 rounded-xl border border-border bg-muted/20 p-4">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              Engine Verification
-            </span>
+               <T>{"Engine Verification"}</T> </span>
             <div className="flex items-center gap-2">
               <StatusBadge status={result.status} />
               {result.verified ? (
                 <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-xs font-medium text-emerald-600 dark:text-emerald-400">
-                  <ShieldCheck className="h-3.5 w-3.5" /> Evidence Locked
-                </span>
+                  <ShieldCheck className="h-3.5 w-3.5" />  <T>{"Evidence Locked"}</T> </span>
               ) : (
                 <span className="inline-flex items-center gap-1 rounded-full bg-destructive/10 px-2 py-0.5 text-xs font-medium text-destructive">
-                  <ShieldAlert className="h-3.5 w-3.5" /> Untrusted / Tampered
-                </span>
+                  <ShieldAlert className="h-3.5 w-3.5" />  <T>{"Untrusted / Tampered"}</T> </span>
               )}
             </div>
           </div>
@@ -242,7 +234,7 @@ export function VerificationLab() {
               ) : (
                 <XCircle className="h-4 w-4 text-destructive" />
               )}
-              <span>Quote in Source: {result.quoteFound ? "Found" : "Mismatched"}</span>
+              <span> <T>{"Quote in Source:"}</T> {result.quoteFound ? t("Found") : t("Mismatched")}</span>
             </div>
 
             <div className="flex items-center gap-1.5 rounded-md border border-border bg-card p-2">
@@ -251,7 +243,7 @@ export function VerificationLab() {
               ) : (
                 <XCircle className="h-4 w-4 text-destructive" />
               )}
-              <span>Name in Quote: {result.nameInQuote ? "Yes" : "No"}</span>
+              <span> <T>{"Name in Quote:"}</T> {result.nameInQuote ? t("Yes") : t("No")}</span>
             </div>
 
             <div className="flex items-center gap-1.5 rounded-md border border-border bg-card p-2">
@@ -260,7 +252,7 @@ export function VerificationLab() {
               ) : (
                 <XCircle className="h-4 w-4 text-destructive" />
               )}
-              <span>Value in Quote: {result.valueInQuote ? "Yes" : "No"}</span>
+              <span> <T>{"Value in Quote:"}</T> {result.valueInQuote ? t("Yes") : t("No")}</span>
             </div>
 
             <div className="flex items-center gap-1.5 rounded-md border border-border bg-card p-2">
@@ -269,13 +261,13 @@ export function VerificationLab() {
               ) : (
                 <XCircle className="h-4 w-4 text-amber-500" />
               )}
-              <span>Range in Quote: {result.rangeInQuote ? "Yes" : "No/Missing"}</span>
+              <span> <T>{"Range in Quote:"}</T> {result.rangeInQuote ? t("Yes") : t("No/Missing")}</span>
             </div>
           </div>
 
           {/* Decision Reason */}
           <div>
-            <p className="text-xs font-semibold text-muted-foreground">Decision Reason</p>
+            <p className="text-xs font-semibold text-muted-foreground"> <T>{"Decision Reason"}</T> </p>
             <p className="mt-0.5 font-mono text-xs text-foreground">
               {result.reason}
             </p>
@@ -283,7 +275,7 @@ export function VerificationLab() {
 
           {/* Rule Trace */}
           <div>
-            <p className="text-xs font-semibold text-muted-foreground">Engine Trace</p>
+            <p className="text-xs font-semibold text-muted-foreground"> <T>{"Engine Trace"}</T> </p>
             <div className="mt-1 max-h-32 overflow-y-auto rounded-md bg-muted/60 p-2 font-mono text-[11px] text-muted-foreground">
               {result.ruleTrace.map((traceLine, i) => (
                 <div key={i}>• {traceLine}</div>

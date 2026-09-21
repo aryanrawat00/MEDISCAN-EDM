@@ -1,3 +1,4 @@
+import { T, useI18n } from "@/lib/i18n";
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { AuthGate } from "@/components/AuthGate";
@@ -17,6 +18,7 @@ export const Route = createFileRoute("/profile")({
 });
 
 function Profile() {
+  const { t } = useI18n();
   const { user } = useAuth();
   const [fullName, setFullName] = useState("");
   const [loading, setLoading] = useState(true);
@@ -43,12 +45,12 @@ function Profile() {
       .upsert({ id: user.id, email: user.email, full_name: fullName, updated_at: new Date().toISOString() });
     setSaving(false);
     if (error) toast.error(error.message);
-    else toast.success("Profile saved");
+    else toast.success(t("Profile saved"));
   };
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-10 sm:px-6">
-      <h1 className="text-2xl font-bold">Profile</h1>
+      <h1 className="text-2xl font-bold"> <T>{"Profile"}</T> </h1>
       <div className="mt-6 rounded-2xl border border-border bg-card p-6">
         <div className="flex items-center gap-4">
           <div className="flex h-14 w-14 items-center justify-center rounded-full brand-gradient text-xl font-semibold text-white">
@@ -56,13 +58,13 @@ function Profile() {
           </div>
           <div className="min-w-0">
             <p className="truncate font-medium">{user?.email}</p>
-            <p className="text-xs text-muted-foreground">User ID: {user?.id}</p>
+            <p className="text-xs text-muted-foreground"> <T>{"User ID:"}</T> {user?.id}</p>
           </div>
         </div>
 
         <div className="mt-6 space-y-4">
           <div>
-            <Label htmlFor="full_name">Full name</Label>
+            <Label htmlFor="full_name"> <T>{"Full name"}</T> </Label>
             <input
               id="full_name"
               value={fullName}
@@ -72,7 +74,7 @@ function Profile() {
             />
           </div>
           <Button onClick={save} disabled={saving || loading} className="brand-gradient text-white">
-            {saving ? "Saving…" : "Save changes"}
+            {saving ? t("Saving…") : t("Save changes")}
           </Button>
         </div>
       </div>

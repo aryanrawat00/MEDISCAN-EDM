@@ -1,3 +1,4 @@
+import { T, useI18n } from "@/lib/i18n";
 /**
  * src/components/report/SourceViewer.tsx
  * T16: Source Document Evidence Viewer (Blueprint §18).
@@ -17,6 +18,7 @@ interface SourceViewerProps {
 }
 
 export function SourceViewer({ sourceText, evidence, fileName, className = "" }: SourceViewerProps) {
+  const { t } = useI18n();
   const highlightRef = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
@@ -32,11 +34,11 @@ export function SourceViewer({ sourceText, evidence, fileName, className = "" }:
     return (
       <div className={`flex flex-col items-center justify-center rounded-xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground ${className}`}>
         <FileText className="mb-2 h-8 w-8 text-muted-foreground/40" />
-        <p className="font-semibold text-foreground">Extracted source text is unavailable</p>
+        <p className="font-semibold text-foreground"> <T>{"Extracted source text is unavailable"}</T> </p>
         <p className="mt-1 text-xs text-muted-foreground">
           {fileName
             ? `Source file: ${fileName}. Raw document text was not retained in session memory.`
-            : "Original document text is not stored for this analysis view."}
+            : t("Original document text is not stored for this analysis view.")}
         </p>
       </div>
     );
@@ -49,7 +51,7 @@ export function SourceViewer({ sourceText, evidence, fileName, className = "" }:
       <div className={`rounded-xl border border-border bg-card p-4 space-y-3 ${className}`}>
         <div className="flex items-center gap-2 text-xs font-semibold uppercase text-muted-foreground">
           <FileText className="h-4 w-4" />
-          <span>Original Report Text</span>
+          <span> <T>{"Original Report Text"}</T> </span>
         </div>
         <pre className="max-h-[360px] overflow-auto whitespace-pre-wrap rounded-lg bg-muted/40 p-4 font-mono text-xs leading-relaxed text-foreground">
           {sourceText}
@@ -67,17 +69,17 @@ export function SourceViewer({ sourceText, evidence, fileName, className = "" }:
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border/60 pb-3">
         <div className="flex items-center gap-2 text-xs font-semibold text-foreground">
           <Quote className="h-4 w-4 text-primary" />
-          <span>Source Evidence Lock</span>
+          <span> <T>{"Source Evidence Lock"}</T> </span>
         </div>
 
         <div className="flex items-center gap-2 text-xs">
           <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 px-2.5 py-0.5 font-medium">
             <CheckCircle2 className="h-3 w-3" />
-            Verbatim Match [Chars {span.start}–{span.end}]
+             <T>{"Verbatim Match [Chars"}</T> {span.start}–{span.end}]
           </span>
           {evidence.page && (
             <span className="rounded-full bg-muted px-2.5 py-0.5 font-mono text-muted-foreground">
-              Page {evidence.page}
+               <T>{"Page"}</T> {evidence.page}
             </span>
           )}
         </div>

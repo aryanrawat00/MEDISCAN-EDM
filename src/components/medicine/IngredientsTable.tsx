@@ -1,3 +1,4 @@
+import { T } from "@/lib/i18n";
 /**
  * src/components/medicine/IngredientsTable.tsx
  * M06: Active Ingredients Table with evidence verification badges (Blueprint §10).
@@ -16,8 +17,7 @@ export function IngredientsTable({ ingredients, className = "" }: IngredientsTab
   if (!ingredients || ingredients.length === 0) {
     return (
       <div className={`rounded-xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground ${className}`}>
-        No active ingredients were detected or verified on this package.
-      </div>
+         <T>{"No active ingredients were detected or verified on this package."}</T> </div>
     );
   }
 
@@ -26,11 +26,11 @@ export function IngredientsTable({ ingredients, className = "" }: IngredientsTab
       <table className="w-full text-left text-sm">
         <thead className="border-b border-border bg-muted/40 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
           <tr>
-            <th className="py-3 px-4">Verification</th>
-            <th className="py-3 px-4">Active Ingredient</th>
-            <th className="py-3 px-4">Strength</th>
-            <th className="py-3 px-4">Verbatim Packaging Quote</th>
-            <th className="py-3 px-4">Monograph Match</th>
+            <th className="py-3 px-4"> <T>{"Verification"}</T> </th>
+            <th className="py-3 px-4"> <T>{"Active Ingredient"}</T> </th>
+            <th className="py-3 px-4"> <T>{"Strength"}</T> </th>
+            <th className="py-3 px-4"> <T>{"Verbatim Packaging Quote"}</T> </th>
+            <th className="py-3 px-4"> <T>{"Monograph Match"}</T> </th>
           </tr>
         </thead>
         <tbody className="divide-y divide-border">
@@ -39,12 +39,10 @@ export function IngredientsTable({ ingredients, className = "" }: IngredientsTab
               <td className="py-3 px-4">
                 {ing.verified ? (
                   <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-xs font-medium text-emerald-600 dark:text-emerald-400">
-                    <ShieldCheck className="h-3.5 w-3.5" /> Evidence Locked
-                  </span>
+                    <ShieldCheck className="h-3.5 w-3.5" />  <T>{"Evidence Locked"}</T> </span>
                 ) : (
                   <span className="inline-flex items-center gap-1 rounded-full bg-destructive/10 px-2.5 py-0.5 text-xs font-medium text-destructive">
-                    <ShieldAlert className="h-3.5 w-3.5" /> Unverified
-                  </span>
+                    <ShieldAlert className="h-3.5 w-3.5" />  <T>{"Unverified"}</T> </span>
                 )}
               </td>
               <td className="py-3 px-4 font-semibold text-foreground">
@@ -65,7 +63,7 @@ export function IngredientsTable({ ingredients, className = "" }: IngredientsTab
                     {ing.matchedMonograph.displayName}
                   </span>
                 ) : (
-                  <span className="text-muted-foreground italic">No reference monograph</span>
+                  <span className="text-muted-foreground italic"> <T>{"No reference monograph"}</T> </span>
                 )}
               </td>
             </tr>

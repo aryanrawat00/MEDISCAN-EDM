@@ -1,256 +1,35 @@
+import { languages, isLanguage, T, useI18n } from "@/lib/i18n";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { useAuth } from "@/lib/auth-context";
 import { useTheme } from "@/lib/theme-context";
 import { Button } from "@/components/ui/button";
-import {
-  Moon,
-  Sun,
-  Stethoscope,
-  Settings,
-  LogOut,
-  FileText,
-  Pill,
-  History as HistoryIcon,
-  LayoutDashboard,
-  Info,
-  Sparkles,
-  Menu,
-  X,
-  User,
-} from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { Moon, Sun, HeartPulse, Settings, LogOut, Menu, X, User, Globe, LayoutDashboard } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
+const links = [{ to: "/", label: "Home" }, { to: "/analyzer", label: "Analyze Report" }, { to: "/medicines", label: "Medicine Lens" }, { to: "/medicines", hash: "drug-interaction-checker", label: "Interactions" }, { to: "/history", label: "History" }];
 export function Navbar() {
   const { user, signOut } = useAuth();
   const { mode, setPrefs } = useTheme();
+  const { language, setLanguage, t } = useI18n();
   const navigate = useNavigate();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
-  const toggleMode = () => setPrefs({ mode: mode === "dark" ? "light" : "dark" });
-
-  const closeMobile = () => setMobileMenuOpen(false);
-
-  return (
-    <>
-      {/* Skip to main content — accessibility */}
-      <a
-        href="#main-content"
-        className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-2 focus:z-50 focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground focus:outline-none"
-      >
-        Skip to main content
-      </a>
-      <header className="sticky top-0 z-40 w-full border-b border-border/60 bg-background/80 backdrop-blur shadow-sm print:hidden">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
-        <Link to="/" onClick={closeMobile} className="flex items-center gap-2">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg brand-gradient text-white">
-            <Stethoscope className="h-5 w-5" />
-          </div>
-          <span className="text-lg font-semibold tracking-tight">
-            MediScan <span className="brand-text-gradient">AI</span>
-          </span>
-        </Link>
-
-        {/* Desktop Navigation */}
-        <nav className="hidden items-center gap-1 md:flex">
-          {user && (
-            <NavLink to="/dashboard">
-              <LayoutDashboard className="mr-1 h-4 w-4" /> Dashboard
-            </NavLink>
-          )}
-          <NavLink to="/analyzer">
-            <FileText className="mr-1 h-4 w-4" /> Report Analyzer
-          </NavLink>
-          <NavLink to="/medicines">
-            <Pill className="mr-1 h-4 w-4" /> Medicine Lens
-          </NavLink>
-          <NavLink to="/demo">
-            <Sparkles className="mr-1 h-4 w-4 text-amber-500" /> Demo Lab
-          </NavLink>
-          {user && (
-            <NavLink to="/history">
-              <HistoryIcon className="mr-1 h-4 w-4" /> History
-            </NavLink>
-          )}
-          <NavLink to="/about">
-            <Info className="mr-1 h-4 w-4" /> About
-          </NavLink>
-        </nav>
-
-        {/* Right Actions */}
-        <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" onClick={toggleMode} aria-label="Toggle theme">
-            {mode === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-          </Button>
-
-          {/* Desktop User Menu */}
-          <div className="hidden md:flex items-center">
-            {user ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="gap-2">
-                    <div className="flex h-7 w-7 items-center justify-center rounded-full brand-gradient text-xs font-semibold text-white">
-                      {(user.email?.[0] ?? "U").toUpperCase()}
-                    </div>
-                    <span className="hidden text-sm sm:inline">{user.email}</span>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
-                  <DropdownMenuLabel>My account</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => navigate({ to: "/profile" })}>
-                    <User className="mr-2 h-4 w-4" /> Profile
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => navigate({ to: "/settings" })}>
-                    <Settings className="mr-2 h-4 w-4" /> Settings
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    onClick={async () => {
-                      await signOut();
-                      navigate({ to: "/" });
-                    }}
-                  >
-                    <LogOut className="mr-2 h-4 w-4" /> Sign out
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            ) : (
-              <Button onClick={() => navigate({ to: "/login" })} className="brand-gradient text-white">
-                Sign in
-              </Button>
-            )}
-          </div>
-
-          {/* Mobile Hamburger Toggle Button */}
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden"
-            aria-label="Toggle navigation menu"
-          >
-            {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-          </Button>
+  const [open, setOpen] = useState(false);
+  const close = () => setOpen(false);
+  return <>
+    <a href="#main-content" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-2 focus:z-50 focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-white"><T>Skip to main content</T></a>
+    <header className="sticky top-0 z-40 border-b border-border/70 bg-card/95 backdrop-blur-sm print:hidden" onKeyDown={e => { if (e.key === "Escape") close(); }}>
+      <div className="mx-auto flex min-h-20 max-w-7xl items-center justify-between gap-3 px-4 sm:px-6">
+        <Link to="/" onClick={close} aria-label={t("MediScan")} className="flex shrink-0 items-center gap-2.5"><span className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-white"><HeartPulse className="h-5 w-5" /></span><span className="text-xl font-bold tracking-tight">MediScan<span className="text-teal-600">.</span></span></Link>
+        <nav aria-label={t("Main navigation")} className="hidden items-center gap-0.5 xl:flex">{links.map(link => <Link key={link.label} to={link.to} hash={link.hash} activeOptions={{ exact: true, includeHash: true }} className="rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground" activeProps={{ className: "text-primary bg-accent" }}><T>{link.label}</T></Link>)}</nav>
+        <div className="flex items-center gap-1.5 sm:gap-2">
+          <label className="flex min-w-0 items-center gap-1 rounded-lg border border-border bg-card px-2 sm:px-3"><Globe className="hidden h-3.5 w-3.5 shrink-0 text-muted-foreground sm:block" /><span className="sr-only"><T>Language</T></span><select className="min-h-10 max-w-24 cursor-pointer bg-transparent py-2 text-xs sm:text-sm" value={language} onChange={e => { if (isLanguage(e.target.value)) setLanguage(e.target.value); }}>{languages.map(lang => <option key={lang.code} value={lang.code} className="bg-card text-foreground">{lang.name}</option>)}</select></label>
+          <Button variant="ghost" size="icon" className="hidden sm:inline-flex" onClick={() => setPrefs({ mode: mode === "dark" ? "light" : "dark" })} aria-label={t("Toggle theme")}>{mode === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}</Button>
+          {user ? <DropdownMenu><DropdownMenuTrigger asChild><Button variant="outline" size="icon" aria-label={t("My account")}><User className="h-4 w-4" /></Button></DropdownMenuTrigger><DropdownMenuContent align="end"><DropdownMenuLabel className="max-w-64 truncate">{user.email}</DropdownMenuLabel><DropdownMenuSeparator />{[{ to: "/dashboard", label: t("Dashboard"), icon: LayoutDashboard }, { to: "/profile", label: t("Profile"), icon: User }, { to: "/settings", label: t("Settings"), icon: Settings }].map(({ to, label, icon: Icon }) => <DropdownMenuItem key={to} onClick={() => navigate({ to })}><Icon className="mr-2 h-4 w-4" /><T>{label}</T></DropdownMenuItem>)}<DropdownMenuSeparator /><DropdownMenuItem onClick={async () => { await signOut(); navigate({ to: "/" }); }}><LogOut className="mr-2 h-4 w-4" /><T>Sign out</T></DropdownMenuItem></DropdownMenuContent></DropdownMenu> : <Button asChild variant="ghost" className="hidden xl:inline-flex"><Link to="/login"><T>Sign in</T></Link></Button>}
+          <Button asChild className="hidden 2xl:inline-flex"><Link to="/analyzer"><T>Get started</T></Link></Button>
+          <Button variant="ghost" size="icon" className="xl:hidden" aria-label={t("Toggle navigation menu")} aria-expanded={open} aria-controls="mobile-navigation" onClick={() => setOpen(!open)}>{open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}</Button>
         </div>
       </div>
-
-      {/* Mobile Drawer Menu */}
-      {mobileMenuOpen && (
-        <div className="border-b border-border/80 bg-background/95 backdrop-blur px-4 py-4 md:hidden animate-in fade-in slide-in-from-top-2 duration-200">
-          <nav className="flex flex-col space-y-1">
-            {user && (
-              <MobileNavLink to="/dashboard" onClick={closeMobile}>
-                <LayoutDashboard className="mr-2 h-4 w-4" /> Dashboard
-              </MobileNavLink>
-            )}
-            <MobileNavLink to="/analyzer" onClick={closeMobile}>
-              <FileText className="mr-2 h-4 w-4" /> Report Analyzer
-            </MobileNavLink>
-            <MobileNavLink to="/medicines" onClick={closeMobile}>
-              <Pill className="mr-2 h-4 w-4" /> Medicine Lens
-            </MobileNavLink>
-            <MobileNavLink to="/demo" onClick={closeMobile}>
-              <Sparkles className="mr-2 h-4 w-4 text-amber-500" /> Demo Lab
-            </MobileNavLink>
-            {user && (
-              <MobileNavLink to="/history" onClick={closeMobile}>
-                <HistoryIcon className="mr-2 h-4 w-4" /> Saved History
-              </MobileNavLink>
-            )}
-            <MobileNavLink to="/about" onClick={closeMobile}>
-              <Info className="mr-2 h-4 w-4" /> About & Principles
-            </MobileNavLink>
-
-            <div className="pt-3 mt-2 border-t border-border/60">
-              {user ? (
-                <div className="space-y-2">
-                  <div className="px-3 py-1 text-xs text-muted-foreground truncate">
-                    Signed in as: <strong className="text-foreground">{user.email}</strong>
-                  </div>
-                  <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="flex-1"
-                      onClick={() => {
-                        closeMobile();
-                        navigate({ to: "/profile" });
-                      }}
-                    >
-                      Profile
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="flex-1 text-destructive hover:bg-destructive/10"
-                      onClick={async () => {
-                        closeMobile();
-                        await signOut();
-                        navigate({ to: "/" });
-                      }}
-                    >
-                      <LogOut className="mr-1.5 h-3.5 w-3.5" /> Sign out
-                    </Button>
-                  </div>
-                </div>
-              ) : (
-                <Button
-                  onClick={() => {
-                    closeMobile();
-                    navigate({ to: "/login" });
-                  }}
-                  className="w-full brand-gradient text-white"
-                >
-                  Sign in / Create Account
-                </Button>
-              )}
-            </div>
-          </nav>
-        </div>
-      )}
+      {open && <nav id="mobile-navigation" aria-label={t("Main navigation")} className="max-h-[calc(100dvh-5rem)] overflow-auto border-t border-border bg-card px-4 py-4 xl:hidden">{[...links, { to: "/demo", label: t("Guided demo") }, { to: "/about", label: t("About & FAQ") }].map(link => <Link key={link.label} to={link.to} hash={'hash' in link ? link.hash : undefined} onClick={close} className="flex min-h-11 items-center rounded-lg px-3 py-2 text-sm hover:bg-muted"><T>{link.label}</T></Link>)}<div className="mt-3 flex gap-3 border-t border-border pt-4"><Button asChild className="flex-1" onClick={close}><Link to="/analyzer"><T>Continue as guest</T></Link></Button>{!user && <Button asChild variant="outline" onClick={close}><Link to="/login"><T>Sign in</T></Link></Button>}<Button variant="outline" size="icon" aria-label={t("Toggle theme")} onClick={() => setPrefs({ mode: mode === "dark" ? "light" : "dark" })}>{mode === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}</Button></div></nav>}
     </header>
-    </>
-  );
+  </>;
 }
-
-function NavLink({ to, children }: { to: string; children: React.ReactNode }) {
-  return (
-    <Link
-      to={to}
-      className="inline-flex items-center rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-      activeProps={{ className: "bg-accent text-foreground" }}
-    >
-      {children}
-    </Link>
-  );
-}
-
-function MobileNavLink({
-  to,
-  children,
-  onClick,
-}: {
-  to: string;
-  children: React.ReactNode;
-  onClick: () => void;
-}) {
-  return (
-    <Link
-      to={to}
-      onClick={onClick}
-      className="flex items-center rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-      activeProps={{ className: "bg-accent text-foreground font-semibold" }}
-    >
-      {children}
-    </Link>
-  );
-}
-

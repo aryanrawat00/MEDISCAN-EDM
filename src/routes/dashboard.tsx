@@ -1,3 +1,4 @@
+import { T, useI18n } from "@/lib/i18n";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { AuthGate } from "@/components/AuthGate";
@@ -19,6 +20,7 @@ export const Route = createFileRoute("/dashboard")({
 });
 
 function Dashboard() {
+  const { t } = useI18n();
   const { user } = useAuth();
   const qc = useQueryClient();
   const { data: analyses = [], isLoading } = useQuery({
@@ -29,7 +31,7 @@ function Dashboard() {
   const clearAll = useMutation({
     mutationFn: deleteAllAnalyses,
     onSuccess: () => {
-      toast.success("History cleared");
+      toast.success(t("History cleared"));
       qc.invalidateQueries({ queryKey: ["analyses"] });
     },
     onError: (e: Error) => toast.error(e.message),
@@ -40,7 +42,7 @@ function Dashboard() {
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">
-            Welcome back{user?.user_metadata?.full_name ? `, ${user.user_metadata.full_name}` : ""}
+             <T>{"Welcome back"}</T> {user?.user_metadata?.full_name ? `, ${user.user_metadata.full_name}` : ""}
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">{user?.email}</p>
         </div>
@@ -51,58 +53,54 @@ function Dashboard() {
         <QuickAction
           to="/analyzer"
           icon={<FileText className="h-5 w-5" />}
-          title="Analyze a report"
-          desc="Paste a lab or radiology report"
+          title={t("Analyze a report")}
+          desc={t("Paste a lab or radiology report")}
         />
         <QuickAction
           to="/medicines"
           icon={<Pill className="h-5 w-5" />}
-          title="Medicine Lens"
-          desc="Verify packaging and ingredients"
+          title={t("Medicine Lens")}
+          desc={t("Verify packaging and ingredients")}
         />
         <QuickAction
           to="/history"
           icon={<HistoryIcon className="h-5 w-5" />}
-          title="View history"
-          desc="All your past analyses"
+          title={t("View history")}
+          desc={t("All your past analyses")}
         />
       </div>
 
       <div className="mt-12">
         <div className="flex items-center justify-between">
-          <h2 className="text-xl font-semibold">Recent analyses</h2>
+          <h2 className="text-xl font-semibold"> <T>{"Recent analyses"}</T> </h2>
           {analyses.length > 0 && (
             <Button
               variant="ghost"
               size="sm"
               onClick={() => {
-                if (confirm("Delete ALL your saved history? This cannot be undone.")) {
+                if (confirm(t("Delete ALL your saved history? This cannot be undone."))) {
                   clearAll.mutate();
                 }
               }}
             >
-              <Trash2 className="mr-2 h-4 w-4" /> Clear all
-            </Button>
+              <Trash2 className="mr-2 h-4 w-4" />  <T>{"Clear all"}</T> </Button>
           )}
         </div>
 
         <div className="mt-4 rounded-2xl border border-border bg-card">
           {isLoading ? (
-            <div className="p-8 text-center text-sm text-muted-foreground">Loading…</div>
+            <div className="p-8 text-center text-sm text-muted-foreground"> <T>{"Loading…"}</T> </div>
           ) : analyses.length === 0 ? (
             <div className="p-10 text-center text-sm text-muted-foreground">
-              No analyses yet. Try the{" "}
+               <T>{"No analyses yet. Try the"}</T> {" "}
               <Link className="underline font-medium text-primary" to="/analyzer">
-                Report Analyzer
-              </Link>
+                 <T>{"Report Analyzer"}</T> </Link>
               ,{" "}
               <Link className="underline font-medium text-primary" to="/medicines">
-                Medicine Lens
-              </Link>
-              , or try the{" "}
+                 <T>{"Medicine Lens"}</T> </Link>
+               <T>{", or try the"}</T> {" "}
               <Link className="underline font-medium text-primary" to="/demo">
-                Demo Lab
-              </Link>
+                 <T>{"Demo Lab"}</T> </Link>
               .
             </div>
           ) : (
@@ -119,8 +117,7 @@ function Dashboard() {
                     to="/history"
                     className="shrink-0 text-sm font-medium text-primary hover:underline"
                   >
-                    Open
-                  </Link>
+                     <T>{"Open"}</T> </Link>
                 </li>
               ))}
             </ul>

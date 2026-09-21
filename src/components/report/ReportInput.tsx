@@ -1,3 +1,4 @@
+import { T, useI18n } from "@/lib/i18n";
 /**
  * src/components/report/ReportInput.tsx
  * T15: Multi-modal report input component (Blueprint §5, §15, §18).
@@ -21,6 +22,8 @@ interface ReportInputProps {
 }
 
 export function ReportInput({ isLoading, onAnalyze, className = "" }: ReportInputProps) {
+  const { t } = useI18n();
+  const [inputMode, setInputMode] = useState<"upload" | "paste">("upload");
   const [text, setText] = useState("");
   const [fileName, setFileName] = useState<string | undefined>();
   const [sourceKind, setSourceKind] = useState<"paste" | "txt" | "pdf" | "demo">("paste");
@@ -38,7 +41,7 @@ export function ReportInput({ isLoading, onAnalyze, className = "" }: ReportInpu
         toast.success(`Extracted ${res.pages} page(s) from PDF.`);
       } catch (err: any) {
         console.error("PDF Extraction error:", err);
-        toast.error("Could not extract text from this PDF. Please ensure it has a text layer, or copy & paste.");
+        toast.error(t("Could not extract text from this PDF. Please ensure it has a text layer, or copy & paste."));
       } finally {
         setIsExtractingPdf(false);
       }
@@ -47,9 +50,9 @@ export function ReportInput({ isLoading, onAnalyze, className = "" }: ReportInpu
       setText(content);
       setFileName(file.name);
       setSourceKind("txt");
-      toast.success("Loaded text file.");
+      toast.success(t("Loaded text file."));
     } else {
-      toast.error("Please upload a .pdf or .txt report file.");
+      toast.error(t("Please upload a .pdf or .txt report file."));
     }
   };
 
@@ -63,7 +66,7 @@ export function ReportInput({ isLoading, onAnalyze, className = "" }: ReportInpu
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!text.trim()) {
-      toast.error("Please paste or upload a medical report.");
+      toast.error(t("Please paste or upload a medical report."));
       return;
     }
     onAnalyze(text, fileName, sourceKind);
@@ -73,15 +76,14 @@ export function ReportInput({ isLoading, onAnalyze, className = "" }: ReportInpu
     <div className={`space-y-4 rounded-2xl border border-border bg-card p-6 shadow-sm ${className}`}>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <Label className="text-base font-semibold">Report Input</Label>
+          <Label htmlFor="report-text" className="text-base font-semibold"> <T>{"Add your report"}</T> </Label>
           <p className="text-xs text-muted-foreground">
-            Paste text, drop a lab PDF, or choose a synthetic clinical sample.
-          </p>
+             <T>{"Upload a PDF or text file. You can also paste your report below."}</T> </p>
         </div>
 
         {/* Quick sample pickers */}
         <div className="flex flex-wrap items-center gap-2">
-          <span className="text-xs text-muted-foreground hidden sm:inline">Try sample:</span>
+          <span className="text-xs text-muted-foreground hidden sm:inline"> <T>{"Try sample:"}</T> </span>
           {REPORT_SAMPLES.map((sample) => (
             <Button
               key={sample.id}
@@ -98,16 +100,20 @@ export function ReportInput({ isLoading, onAnalyze, className = "" }: ReportInpu
         </div>
       </div>
 
+      <div className="flex flex-wrap gap-2 border-b border-border pb-4"><Button type="button" variant={inputMode === "upload" ? "secondary" : "ghost"} aria-pressed={inputMode === "upload"} onClick={() => setInputMode("upload")}> <T>{"Upload a file"}</T> </Button><Button type="button" variant={inputMode === "paste" ? "secondary" : "ghost"} aria-pressed={inputMode === "paste"} onClick={() => setInputMode("paste")}> <T>{"Paste report text"}</T> </Button></div>
+      {inputMode === "upload" && <button type="button" disabled={isLoading || isExtractingPdf} onClick={() => fileInputRef.current?.click()} onDragOver={e=>e.preventDefault()} onDrop={e=>{e.preventDefault(); if (!isLoading && !isExtractingPdf && e.dataTransfer.files[0]) void handleFileUpload(e.dataTransfer.files[0]);}} className="flex min-h-52 w-full flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed border-primary/25 bg-primary/[.025] p-7 text-center transition-colors hover:border-primary/60 disabled:opacity-60"><span className="rounded-xl border border-border bg-card p-3"><Upload className="h-6 w-6 text-primary" /></span><span className="text-base font-semibold">{isExtractingPdf ? t("Reading your PDF…") : fileName || "Choose a report or drop it here"}</span><span className="text-xs text-muted-foreground"> <T>{"PDF with selectable text, or a TXT file"}</T> </span></button>}
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="relative">
+        <div className={inputMode === "paste" || text ? "relative" : "hidden"}>
           <Textarea
+            id="report-text"
+            aria-label={t("Report text")}
             value={text}
             onChange={(e) => {
               setText(e.target.value);
               setSourceKind("paste");
             }}
-            placeholder="Paste complete blood count (CBC), metabolic panel, or lab report text here..."
-            className="min-h-[220px] font-mono text-xs leading-relaxed resize-y"
+            placeholder={t("Paste complete blood count (CBC), metabolic panel, or lab report text here...")}
+            className="min-h-[180px] text-sm leading-relaxed resize-y"
             disabled={isLoading || isExtractingPdf}
           />
 
@@ -115,7 +121,7 @@ export function ReportInput({ isLoading, onAnalyze, className = "" }: ReportInpu
             <div className="absolute inset-0 flex items-center justify-center rounded-md bg-background/80 backdrop-blur-sm">
               <div className="flex items-center gap-2 text-sm font-medium text-primary">
                 <Loader2 className="h-4 w-4 animate-spin" />
-                <span>Recovering PDF text layout in browser...</span>
+                <span> <T>{"Reading your PDF…"}</T> </span>
               </div>
             </div>
           )}
@@ -142,8 +148,7 @@ export function ReportInput({ isLoading, onAnalyze, className = "" }: ReportInpu
               disabled={isLoading || isExtractingPdf}
             >
               <Upload className="mr-1.5 h-4 w-4" />
-              Upload PDF or TXT
-            </Button>
+               <T>{"Upload PDF or TXT"}</T> </Button>
 
             {text && (
               <Button
@@ -157,15 +162,13 @@ export function ReportInput({ isLoading, onAnalyze, className = "" }: ReportInpu
                   setSourceKind("paste");
                 }}
               >
-                Clear
-              </Button>
+                 <T>{"Clear"}</T> </Button>
             )}
           </div>
 
           <div className="flex items-center gap-3">
             <span className="text-xs text-muted-foreground font-mono">
-              {text.length} chars
-            </span>
+              {text.length}  <T>{"chars"}</T> </span>
             <Button
               type="submit"
               disabled={isLoading || isExtractingPdf || text.trim().length < 10}
@@ -174,13 +177,11 @@ export function ReportInput({ isLoading, onAnalyze, className = "" }: ReportInpu
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Verifying Evidence...
-                </>
+                   <T>{"Analyzing your report…"}</T> </>
               ) : (
                 <>
                   <FileText className="mr-2 h-4 w-4" />
-                  Analyze with Evidence
-                </>
+                   <T>{"Understand my report"}</T> </>
               )}
             </Button>
           </div>
@@ -190,8 +191,7 @@ export function ReportInput({ isLoading, onAnalyze, className = "" }: ReportInpu
       <div className="flex items-center gap-2 rounded-lg bg-muted/40 p-2.5 text-[11px] text-muted-foreground border border-border/40">
         <ShieldCheck className="h-4 w-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
         <span>
-          <strong>Evidence Guarantee:</strong> Every result is anchored to a verbatim quote in your submitted text. Values are evaluated strictly against the report's printed reference range.
-        </span>
+           <T>{"Values are compared with the reference ranges in your report. You can check the supporting evidence in your results."}</T> </span>
       </div>
     </div>
   );

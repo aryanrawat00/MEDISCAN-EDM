@@ -19,7 +19,7 @@ export interface ThemePrefs {
 
 const DEFAULTS: ThemePrefs = {
   mode: "light",
-  primary: "#2563eb",
+  primary: "#153e56",
   fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif",
   fontSize: 16,
   radius: 10,
@@ -112,3 +112,4 @@ export function useTheme() {
   if (!v) throw new Error("useTheme must be used inside <ThemeProvider>");
   return v;
 }
+

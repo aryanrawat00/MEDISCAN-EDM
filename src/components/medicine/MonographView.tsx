@@ -1,3 +1,4 @@
+import { T } from "@/lib/i18n";
 /**
  * src/components/medicine/MonographView.tsx
  * M06: Official Reference Monograph Inspector (Blueprint §10).
@@ -23,8 +24,7 @@ export function MonographView({
   if (!monographs || monographs.length === 0) {
     return (
       <div className={`rounded-xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground ${className}`}>
-        No approved OTC reference monographs matched this scan.
-      </div>
+         <T>{"No approved OTC reference monographs matched this scan."}</T> </div>
     );
   }
 
@@ -44,7 +44,7 @@ export function MonographView({
                 </span>
               </div>
               <p className="mt-0.5 text-xs text-muted-foreground">
-                Generic: <strong className="text-foreground">{mono.genericName}</strong> · Purpose: {mono.purposeText}
+                 <T>{"Generic:"}</T> <strong className="text-foreground">{mono.genericName}</strong>  <T>{"· Purpose:"}</T> {mono.purposeText}
               </p>
             </div>
 
@@ -56,11 +56,11 @@ export function MonographView({
                   className="inline-flex items-center gap-1.5 rounded-lg border border-primary/40 bg-primary/5 px-2.5 py-1 text-xs font-semibold text-primary hover:bg-primary/10 transition-colors"
                 >
                   <Bookmark className="h-3.5 w-3.5" />
-                  <span>Add to Interaction Check</span>
+                  <span> <T>{"Add to Interaction Check"}</T> </span>
                 </button>
               )}
               <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-xs font-medium text-emerald-600 dark:text-emerald-400">
-                <ShieldCheck className="h-3.5 w-3.5" /> Reviewed by {mono.review.by}
+                <ShieldCheck className="h-3.5 w-3.5" />  <T>{"Reviewed by"}</T> {mono.review.by}
               </span>
             </div>
           </div>
@@ -70,7 +70,7 @@ export function MonographView({
             <div className="rounded-lg border border-destructive/30 bg-destructive/10 p-3.5 text-xs space-y-1">
               <div className="flex items-center gap-1.5 font-bold text-destructive">
                 <AlertOctagon className="h-4 w-4 shrink-0" />
-                <span>OFFICIAL FDA BOXED WARNING</span>
+                <span> <T>{"OFFICIAL FDA BOXED WARNING"}</T> </span>
               </div>
               <ul className="list-disc pl-5 text-destructive space-y-1">
                 {mono.boxedWarnings.map((w, i) => (
@@ -83,8 +83,7 @@ export function MonographView({
           {/* Indications / Common Uses */}
           <div>
             <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1.5 flex items-center gap-1.5">
-              <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" /> FDA Approved Indications & Uses
-            </h4>
+              <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />  <T>{"FDA Approved Indications & Uses"}</T> </h4>
             <ul className="list-disc pl-5 text-xs text-muted-foreground space-y-1">
               {mono.commonUses.map((use, i) => (
                 <li key={i} className="text-foreground/90">{use}</li>
@@ -95,8 +94,7 @@ export function MonographView({
           {/* Important Safety */}
           <div>
             <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1.5 flex items-center gap-1.5">
-              <AlertTriangle className="h-3.5 w-3.5 text-amber-500" /> Important Safety Warnings & Precautions
-            </h4>
+              <AlertTriangle className="h-3.5 w-3.5 text-amber-500" />  <T>{"Important Safety Warnings & Precautions"}</T> </h4>
             <ul className="list-disc pl-5 text-xs text-muted-foreground space-y-1.5">
               {mono.importantSafety.map((warn, i) => (
                 <li key={i} className="text-foreground/90">{warn}</li>
@@ -106,14 +104,14 @@ export function MonographView({
 
           {/* SPL Provenance Footer */}
           <div className="flex flex-wrap items-center justify-between gap-2 border-t border-border pt-3 text-[11px] text-muted-foreground font-mono">
-            <span>Source: {mono.source.name} (Set ID: {mono.source.setId.slice(0, 8)}…)</span>
+            <span> <T>{"Source:"}</T> {mono.source.name}  <T>{"(Set ID:"}</T> {mono.source.setId.slice(0, 8)}…)</span>
             <a
               href={mono.source.url}
               target="_blank"
               rel="noreferrer"
               className="inline-flex items-center gap-1 text-primary hover:underline"
             >
-              <span>openFDA Monograph</span>
+              <span> <T>{"openFDA Monograph"}</T> </span>
               <ExternalLink className="h-3 w-3" />
             </a>
           </div>

@@ -1,3 +1,4 @@
+import { T, useI18n } from "@/lib/i18n";
 /**
  * src/components/history/ResultView.tsx
  * T23a: Polymorphic result view resolver for saved history (Blueprint §23a).
@@ -65,6 +66,7 @@ export function ResultView({ kind, result }: ResultViewProps) {
  * Rich renderer for V2 Report in History
  */
 function V2ReportHistoryView({ analysis }: { analysis: ReportAnalysisV2 }) {
+  const { t } = useI18n();
   const [activeView, setActiveView] = useState<"findings" | "brief">("findings");
   const [selectedId, setSelectedId] = useState<string | null>(
     analysis.pipeline.findings[0]?.id ?? null,
@@ -79,11 +81,9 @@ function V2ReportHistoryView({ analysis }: { analysis: ReportAnalysisV2 }) {
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border pb-3">
         <div className="flex items-center gap-2">
           <span className="inline-flex items-center gap-1 rounded bg-emerald-500/10 px-2 py-0.5 text-xs font-medium text-emerald-600 dark:text-emerald-400">
-            <ShieldCheck className="h-3.5 w-3.5" /> Schema v2 Verified
-          </span>
+            <ShieldCheck className="h-3.5 w-3.5" />  <T>{"Schema v2 Verified"}</T> </span>
           <span className="text-xs text-muted-foreground">
-            {analysis.pipeline.findings.length} findings · {analysis.pipeline.stats.verified} locked quotes
-          </span>
+            {analysis.pipeline.findings.length}  <T>{"findings ·"}</T> {analysis.pipeline.stats.verified}  <T>{"locked quotes"}</T> </span>
         </div>
 
         <div className="flex items-center gap-1">
@@ -93,8 +93,7 @@ function V2ReportHistoryView({ analysis }: { analysis: ReportAnalysisV2 }) {
             className="text-xs h-7"
             onClick={() => setActiveView("findings")}
           >
-            Findings Table
-          </Button>
+             <T>{"Findings Table"}</T> </Button>
           {analysis.brief && (
             <Button
               variant={activeView === "brief" ? "secondary" : "ghost"}
@@ -102,8 +101,7 @@ function V2ReportHistoryView({ analysis }: { analysis: ReportAnalysisV2 }) {
               className="text-xs h-7"
               onClick={() => setActiveView("brief")}
             >
-              Doctor Brief
-            </Button>
+               <T>{"Doctor Brief"}</T> </Button>
           )}
         </div>
       </div>
@@ -141,7 +139,7 @@ function V3MedicineHistoryView({ scan }: { scan: MedicineScanV3 }) {
           className="text-xs h-7"
           onClick={() => setActiveTab("ingredients")}
         >
-          Verified Ingredients ({scan.verifiedIngredients.length})
+           <T>{"Verified Ingredients ("}</T> {scan.verifiedIngredients.length})
         </Button>
         {scan.monographs.length > 0 && (
           <Button
@@ -150,7 +148,7 @@ function V3MedicineHistoryView({ scan }: { scan: MedicineScanV3 }) {
             className="text-xs h-7"
             onClick={() => setActiveTab("monograph")}
           >
-            Official Monograph ({scan.monographs.length})
+             <T>{"Official Monograph ("}</T> {scan.monographs.length})
           </Button>
         )}
       </div>
@@ -161,8 +159,7 @@ function V3MedicineHistoryView({ scan }: { scan: MedicineScanV3 }) {
           {scan.safetyWarnings.length > 0 && (
             <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-3 text-xs">
               <p className="font-semibold text-amber-700 dark:text-amber-400 mb-1">
-                FDA Label Safety Warnings
-              </p>
+                 <T>{"FDA Label Safety Warnings"}</T> </p>
               <ul className="list-disc pl-4 space-y-1 text-muted-foreground">
                 {scan.safetyWarnings.slice(0, 3).map((w, i) => (
                   <li key={i}>{w}</li>
@@ -187,20 +184,19 @@ function LegacyMedicineHistoryView({ m }: { m: LegacyMedicineResult }) {
       <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 p-3 text-xs text-amber-600 dark:text-amber-400 flex items-center gap-2">
         <AlertTriangle className="h-4 w-4 shrink-0" />
         <span>
-          Legacy Medicine Record — Unverified AI lookup predating openFDA reference verification.
-        </span>
+           <T>{"Legacy Medicine Record — Unverified AI lookup predating openFDA reference verification."}</T> </span>
       </div>
 
       <div>
         <h3 className="text-lg font-bold">{m.name}</h3>
         {m.generic_name && (
-          <p className="text-xs text-muted-foreground">Generic: {m.generic_name}</p>
+          <p className="text-xs text-muted-foreground"> <T>{"Generic:"}</T> {m.generic_name}</p>
         )}
       </div>
 
       {m.uses && m.uses.length > 0 && (
         <div>
-          <h4 className="font-semibold text-xs uppercase text-muted-foreground">Uses</h4>
+          <h4 className="font-semibold text-xs uppercase text-muted-foreground"> <T>{"Uses"}</T> </h4>
           <ul className="mt-1 list-disc pl-5 text-muted-foreground text-xs">
             {m.uses.map((u, i) => (
               <li key={i}>{u}</li>
@@ -216,6 +212,7 @@ function LegacyMedicineHistoryView({ m }: { m: LegacyMedicineResult }) {
  * Unknown result renderer with graceful raw JSON fallback
  */
 function UnknownResultView({ raw, error }: { raw: unknown; error?: string }) {
+  const { t } = useI18n();
   const [showJson, setShowJson] = useState(false);
 
   return (
@@ -232,7 +229,7 @@ function UnknownResultView({ raw, error }: { raw: unknown; error?: string }) {
           onClick={() => setShowJson(!showJson)}
         >
           <Code2 className="mr-1 h-3.5 w-3.5" />
-          {showJson ? "Hide Raw Data" : "Inspect Raw Data"}
+          {showJson ? t("Hide Raw Data") : t("Inspect Raw Data")}
         </Button>
       </div>
 

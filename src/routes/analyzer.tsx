@@ -1,3 +1,4 @@
+import { T, useI18n } from "@/lib/i18n";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
@@ -36,6 +37,7 @@ export const Route = createFileRoute("/analyzer")({
 type ActiveTab = "findings" | "brief" | "trace" | "lab";
 
 function Analyzer() {
+  const { t } = useI18n();
   const { user } = useAuth();
   const qc = useQueryClient();
   const [activeTab, setActiveTab] = useState<ActiveTab>("findings");
@@ -76,7 +78,7 @@ function Analyzer() {
         })
           .then(() => {
             qc.invalidateQueries({ queryKey: ["analyses"] });
-            toast.success("Analysis saved to your private history.");
+            toast.success(t("Analysis saved to your private history."));
           })
           .catch((err) => {
             console.warn("Failed to auto-save analysis to Supabase:", err);
@@ -84,7 +86,7 @@ function Analyzer() {
       } else {
         // Guest mode: session memory only
         toast.info(
-          "Analysis complete in Guest Mode. Sign in anytime to save your results to permanent history.",
+          t("Analysis complete in Guest Mode. Sign in anytime to save your results to permanent history."),
         );
       }
     }
@@ -106,16 +108,13 @@ function Analyzer() {
         <div className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border/80 bg-muted/40 px-4 py-3 text-xs text-foreground print:hidden">
           <div className="flex items-center gap-2">
             <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-0.5 font-semibold text-primary">
-              <Sparkles className="h-3 w-3" /> Guest Session
-            </span>
+              <Sparkles className="h-3 w-3" />  <T>{"Guest Session"}</T> </span>
             <span className="text-muted-foreground">
-              Live deterministic clinical analysis is active. Results are kept in browser memory.
-            </span>
+               <T>{"Your results stay in this session. Sign in to keep them in your history."}</T> </span>
           </div>
           <Button asChild size="sm" variant="outline" className="h-7 text-xs">
             <Link to="/login">
-              <LogIn className="mr-1.5 h-3 w-3" /> Sign in to save history
-            </Link>
+              <LogIn className="mr-1.5 h-3 w-3" />  <T>{"Sign in to save history"}</T> </Link>
           </Button>
         </div>
       )}
@@ -127,75 +126,40 @@ function Analyzer() {
             <FileText className="h-6 w-6" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold tracking-tight">Report Intelligence Lens</h1>
+            <h1 className="text-2xl font-bold tracking-tight"> <T>{"Understand your report"}</T> </h1>
             <p className="text-sm text-muted-foreground">
-              Extracts medical findings, locks verbatim quotes to source text, and evaluates ranges deterministically.
-            </p>
+               <T>{"Upload your report, understand the findings, and see the evidence."}</T> </p>
           </div>
         </div>
 
         {analysis && (
           <div className="flex items-center gap-2">
             <Button variant="outline" size="sm" onClick={handleReset}>
-              <RotateCcw className="mr-1.5 h-3.5 w-3.5" /> New Analysis
-            </Button>
+              <RotateCcw className="mr-1.5 h-3.5 w-3.5" />  <T>{"New Analysis"}</T> </Button>
           </div>
         )}
       </div>
 
       <Disclaimer className="mt-4 print:hidden" />
 
+      {error && <div role="alert" className="mt-5 rounded-xl border border-destructive/30 bg-card p-4 text-sm text-destructive">{error}</div>}
       {/* Main View: Input vs Results */}
       {!analysis ? (
         <div className="mt-8 space-y-8">
           <ReportInput isLoading={isAnalyzing} onAnalyze={handleAnalyze} />
 
-          {/* Verification Lab Showcase */}
-          <div className="mt-12">
-            <div className="mb-3">
-              <h2 className="text-lg font-semibold tracking-tight">
-                Try the Live Evidence & Tamper Engine
-              </h2>
-              <p className="text-xs text-muted-foreground">
-                See how deterministic quote matching prevents AI hallucinations and invalid claims without sending data to any LLM.
-              </p>
-            </div>
-            <VerificationLab />
-          </div>
+          <details className="rounded-xl border border-border bg-card p-5"><summary className="cursor-pointer text-sm font-medium"> <T>{"Explore how evidence is checked"}</T> </summary><div className="mt-5"><VerificationLab /></div></details>
         </div>
       ) : (
         <div className="mt-6 space-y-6">
-          {/* Summary Strip */}
-          <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-border bg-card p-4 shadow-sm print:hidden">
-            <div>
-              <div className="flex items-center gap-2">
-                <h2 className="font-semibold text-foreground">{reportTitle}</h2>
-                <span className="rounded bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
-                  v{analysis.schemaVersion} Verified
-                </span>
-              </div>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                Analyzed {analysis.pipeline.findings.length} findings in{" "}
-                {analysis.pipeline.trace.reduce((acc, t) => acc + t.ms, 0)} ms ·{" "}
-                {analysis.pipeline.stats.verified} locked quotes
-              </p>
+          <section className="rounded-2xl border border-border bg-card p-5 sm:p-7">
+            <p className="text-xs text-muted-foreground"> <T>{"Your report at a glance"}</T> </p><h2 className="mt-1 text-xl font-semibold">{reportTitle}</h2>
+            <p className="mt-2 text-sm text-muted-foreground"> <T>{"Start with findings outside the reference range. A finding is a comparison, not a diagnosis."}</T> </p>
+            <div className="mt-6 grid grid-cols-2 gap-5 border-t border-border pt-5 sm:grid-cols-4">
+              {[[analysis.pipeline.stats.raw, t("Parameters detected")], [analysis.pipeline.findings.filter(f => f.status === "NORMAL").length, t("Within reference range")], [analysis.pipeline.findings.filter(f => f.status === "LOW" || f.status === "HIGH").length, t("Outside reference range")], [analysis.pipeline.findings.filter(f => f.status === "UNKNOWN").length + analysis.pipeline.unverified.length, t("Requires verification")]].map(([value,label]) => <div key={label}><p className="text-2xl font-semibold">{value}</p><p className="mt-1 text-xs text-muted-foreground"><T>{String(label)}</T></p></div>)}
             </div>
-
-            {/* Quick Metrics */}
-            <div className="flex items-center gap-4 text-xs">
-              <div className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-medium">
-                <ShieldCheck className="h-4 w-4" />
-                <span>{analysis.pipeline.stats.verified} Verified</span>
-              </div>
-              {analysis.pipeline.stats.flagged > 0 && (
-                <div className="flex items-center gap-1.5 text-rose-500 font-medium">
-                  <AlertTriangle className="h-4 w-4" />
-                  <span>{analysis.pipeline.stats.flagged} Flagged</span>
-                </div>
-              )}
-            </div>
-          </div>
-
+            {analysis.pipeline.unverified.length > 0 && <details className="mt-5 rounded-lg border border-amber-300/50 p-3 text-sm"><summary className="cursor-pointer"> <T>{"Some extracted values could not be verified"}</T> </summary><ul className="mt-3 list-disc space-y-1 pl-5">{analysis.pipeline.unverified.map((f,i) => <li key={i}>{f.testName}: {f.valueText}</li>)}</ul></details>}
+          </section>
           {/* Navigation Tabs */}
           <div className="flex flex-wrap items-center gap-2 border-b border-border pb-1 print:hidden">
             <TabButton
@@ -208,20 +172,9 @@ function Analyzer() {
               active={activeTab === "brief"}
               onClick={() => setActiveTab("brief")}
               icon={<FileCheck className="h-4 w-4" />}
-              label="Doctor Visit Brief"
+              label={t("Doctor Visit Brief")}
             />
-            <TabButton
-              active={activeTab === "trace"}
-              onClick={() => setActiveTab("trace")}
-              icon={<Activity className="h-4 w-4" />}
-              label="Pipeline Telemetry"
-            />
-            <TabButton
-              active={activeTab === "lab"}
-              onClick={() => setActiveTab("lab")}
-              icon={<FlaskConical className="h-4 w-4" />}
-              label="Tamper Lab"
-            />
+            <details className="relative"><summary className="cursor-pointer rounded-lg px-3 py-2 text-xs text-muted-foreground"> <T>{"Advanced tools"}</T> </summary><div className="absolute right-0 z-10 mt-1 flex min-w-48 flex-col gap-2 rounded-xl border border-border bg-card p-3 shadow-md"><TabButton active={activeTab === "trace"} onClick={() => setActiveTab("trace")} icon={<Activity className="h-4 w-4" />} label={t("Pipeline Telemetry")} /><TabButton active={activeTab === "lab"} onClick={() => setActiveTab("lab")} icon={<FlaskConical className="h-4 w-4" />} label={t("Tamper Lab")} /></div></details>
           </div>
 
           {/* Tab 1: Findings & Evidence (Table + Split Inspector) */}
@@ -233,18 +186,16 @@ function Analyzer() {
                 onSelectFinding={setSelectedFindingId}
               />
 
-              <div className="grid gap-6 lg:grid-cols-2">
+              <details className="rounded-xl border border-border bg-card p-5"><summary className="cursor-pointer text-sm font-medium"> <T>{"Source document and verification details"}</T> </summary><div className="mt-5 grid gap-6 lg:grid-cols-2">
                 <div>
                   <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                    Finding Evidence Audit
-                  </h3>
+                     <T>{"Finding details"}</T> </h3>
                   <FindingDetail finding={selectedFinding} />
                 </div>
 
                 <div>
                   <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                    Source Document Span
-                  </h3>
+                     <T>{"Original report text"}</T> </h3>
                   <div className="max-h-[500px] overflow-auto rounded-xl border border-border bg-card p-4 shadow-sm font-mono text-xs">
                     <SourceViewer
                       sourceText={lastSourceText}
@@ -253,7 +204,7 @@ function Analyzer() {
                     />
                   </div>
                 </div>
-              </div>
+              </div></details>
             </div>
           )}
 

@@ -1,3 +1,4 @@
+import { T, useI18n } from "@/lib/i18n";
 /**
  * src/components/report/RangeBar.tsx
  * T13: Horizontal range visualization bar (Blueprint §13, §18).
@@ -16,10 +17,11 @@ interface RangeBarProps {
 }
 
 export function RangeBar({ value, range, status, unit, className = "" }: RangeBarProps) {
+  const { t } = useI18n();
   if (value.kind !== "numeric" || range.kind !== "interval") {
     return (
       <div className={`text-xs text-muted-foreground italic ${className}`}>
-        {range.kind === "text" ? `Ref: ${range.token}` : "No visual range"}
+        {range.kind === "text" ? `Ref: ${range.token}` : t("No visual range")}
       </div>
     );
   }
@@ -116,7 +118,7 @@ export function RangeBar({ value, range, status, unit, className = "" }: RangeBa
         </div>
         <div className="flex justify-between text-[10px] text-muted-foreground font-mono">
           <span>&gt; {lo}</span>
-          <span>High</span>
+          <span> <T>{"High"}</T> </span>
         </div>
       </div>
     );
