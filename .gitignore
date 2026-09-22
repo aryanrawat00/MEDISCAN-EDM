@@ -32,3 +32,7 @@ coverage/
 
 # ─── npm cache (redirected to F drive) ──────────────────────
 npm-cache/
+
+# ─── Temporary build scratch ────────────────────────────────
+.codex-ppt-build/
+
