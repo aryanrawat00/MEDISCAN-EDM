@@ -13,6 +13,7 @@ export default defineConfig({
     server: { entry: "server" },
   },
   nitro: {
+    preset: process.env.NITRO_PRESET || (process.env.RENDER ? "node-server" : undefined),
     output: {
       dir: "dist",
       serverDir: "dist/server",
