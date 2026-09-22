@@ -10,6 +10,7 @@ import React, { useState } from "react";
 import { ReportAnalysisV2 } from "@/lib/report/types";
 import { LegacyReportResult, LegacySymptomResult, LegacyMedicineResult } from "@/lib/legacy";
 import { FindingsTable } from "@/components/report/FindingsTable";
+import { PatientFindings } from "@/components/report/PatientFindings";
 import { FindingDetail } from "@/components/report/FindingDetail";
 import { DoctorBriefView } from "@/components/report/DoctorBrief";
 import { LegacyReportView } from "@/components/report/LegacyReportView";
@@ -108,11 +109,15 @@ function V2ReportHistoryView({ analysis }: { analysis: ReportAnalysisV2 }) {
 
       {activeView === "findings" ? (
         <div className="space-y-4">
-          <FindingsTable
+          <PatientFindings
+            findings={analysis.pipeline.findings}
+            onSeeEvidence={(finding) => setSelectedId(finding.id)}
+          />
+          <details className="rounded-xl border border-border bg-card p-5"><summary className="cursor-pointer text-sm font-medium"><T>Open the detailed table</T></summary><div className="mt-5"><FindingsTable
             findings={analysis.pipeline.findings}
             selectedFindingId={selectedId}
             onSelectFinding={setSelectedId}
-          />
+          /></div></details>
           <FindingDetail finding={selectedFinding} />
         </div>
       ) : (

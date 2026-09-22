@@ -93,6 +93,12 @@ export function MonographView({
             </div>
           </div>
 
+          <div className="grid gap-2 rounded-xl border border-border bg-muted/20 p-4 text-sm sm:grid-cols-3">
+            <div><p className="text-xs font-medium text-muted-foreground"><T>What it is</T></p><p className="mt-1 font-semibold">{mono.genericName}</p></div>
+            <div><p className="text-xs font-medium text-muted-foreground"><T>Common forms</T></p><p className="mt-1">{mono.dosageForms?.join(", ") || <T>Not listed in this label</T>}</p></div>
+            <div><p className="text-xs font-medium text-muted-foreground"><T>Reference strengths</T></p><p className="mt-1">{mono.standardStrengths?.join(", ") || <T>Not listed in this label</T>}</p></div>
+          </div>
+
           {/* Boxed Warnings if any */}
           {mono.boxedWarnings && mono.boxedWarnings.length > 0 && (
             <div className="rounded-lg border border-destructive/30 bg-destructive/10 p-3.5 text-xs space-y-1">
@@ -123,6 +129,7 @@ export function MonographView({
           <div>
             <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1.5 flex items-center gap-1.5">
               <AlertTriangle className="h-3.5 w-3.5 text-amber-500" />  <T>{"Important Safety Warnings & Precautions"}</T> </h4>
+            <p className="mb-2 text-xs text-muted-foreground"><T>Read these warnings before using the medicine. Keep the original label wording below.</T></p>
             <ul className="list-disc pl-5 text-xs text-muted-foreground space-y-1.5">
               {mono.importantSafety.map((warn, i) => (
                 <li key={i} className="text-foreground/90"><MedicineWarning medicine={mono} original={warn} mode={mode} /></li>

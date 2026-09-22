@@ -12,6 +12,7 @@ import { REPORT_SAMPLES, type ReportSample } from "@/lib/report/samples";
 import { runReportPipeline } from "@/lib/report/pipeline";
 import { buildDoctorBrief } from "@/lib/report/brief";
 import { FindingsTable } from "@/components/report/FindingsTable";
+import { PatientFindings } from "@/components/report/PatientFindings";
 import { FindingDetail } from "@/components/report/FindingDetail";
 import { SourceViewer } from "@/components/report/SourceViewer";
 import { PipelineTrace } from "@/components/report/PipelineTrace";
@@ -256,11 +257,16 @@ function DemoPage() {
           {/* SubTab 1: Findings & Evidence */}
           {reportSubTab === "findings" && (
             <div className="space-y-6">
-              <FindingsTable
+              <PatientFindings
+                findings={pipelineResult.findings}
+                onSeeEvidence={(finding) => setSelectedFindingId(finding.id)}
+              />
+
+              <details className="rounded-xl border border-border bg-card p-5"><summary className="cursor-pointer text-sm font-medium"><T>Open the detailed table</T></summary><div className="mt-5"><FindingsTable
                 findings={pipelineResult.findings}
                 selectedFindingId={activeFindingId}
                 onSelectFinding={setSelectedFindingId}
-              />
+              /></div></details>
 
               <div className="grid gap-6 lg:grid-cols-2">
                 <div>

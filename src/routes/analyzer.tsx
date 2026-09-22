@@ -7,6 +7,7 @@ import { Disclaimer } from "@/components/Disclaimer";
 import { Button } from "@/components/ui/button";
 import { ReportInput } from "@/components/report/ReportInput";
 import { FindingsTable } from "@/components/report/FindingsTable";
+import { PatientFindings } from "@/components/report/PatientFindings";
 import { FindingDetail } from "@/components/report/FindingDetail";
 import { SourceViewer } from "@/components/report/SourceViewer";
 import { PipelineTrace } from "@/components/report/PipelineTrace";
@@ -180,11 +181,18 @@ function Analyzer() {
           {/* Tab 1: Findings & Evidence (Table + Split Inspector) */}
           {activeTab === "findings" && (
             <div className="space-y-6 print:hidden">
-              <FindingsTable
+              <PatientFindings
+                findings={analysis.pipeline.findings}
+                onSeeEvidence={(finding) => setSelectedFindingId(finding.id)}
+                sourceTextAvailable={Boolean(lastSourceText)}
+              />
+
+              <details className="rounded-xl border border-border bg-card p-5"><summary className="cursor-pointer text-sm font-medium"><T>Open the detailed table</T></summary><div className="mt-5"><FindingsTable
                 findings={analysis.pipeline.findings}
                 selectedFindingId={selectedFindingId}
                 onSelectFinding={setSelectedFindingId}
-              />
+                sourceTextAvailable={Boolean(lastSourceText)}
+              /></div></details>
 
               <details className="rounded-xl border border-border bg-card p-5"><summary className="cursor-pointer text-sm font-medium"> <T>{"Source document and verification details"}</T> </summary><div className="mt-5 grid gap-6 lg:grid-cols-2">
                 <div>

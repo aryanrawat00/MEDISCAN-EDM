@@ -120,3 +120,23 @@ translations were introduced. The optional glossary was intentionally omitted.
 - Phone-width preview: report dialog, reference card, warnings and source footer
   inspected at 390 px. Plain mode retains the shorter default warning presentation;
   stronger original prohibitions remain visible as documented above.
+
+## Follow-up patient experience layer
+
+The report findings tab now opens with `PatientFindings`: an at-a-glance count,
+filters for outside/within/unclear results, a compact range card, a sourced
+"What this checks" explanation, a factual "What yours shows" sentence, a
+non-diagnostic next step, expandable precautions, source links, and a doctor
+visit checklist. The prior Simple/Detailed table and source inspector remain
+available under `Open the detailed table`.
+
+The education dictionary currently covers the report samples' CBC, glucose,
+kidney, lipid and thyroid labels. Unknown tests use a safe fallback and never
+receive an inferred medical explanation. Critical/panic banners require a
+verified matching printed flag and source quote; urgency is never inferred from
+a numeric distance from a range.
+
+Medicine cards now include a compact quick-facts row for generic ingredient,
+label-listed forms and reference strengths, plus a short plain-language cue
+before the existing safety wording. These values come directly from the approved
+reference snapshot.
